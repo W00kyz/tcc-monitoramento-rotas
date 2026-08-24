@@ -85,6 +85,15 @@ services:
       backend:
         condition: service_healthy
 
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v6.0.0@sha256:729461bcc9ae9e6aafa92c0f93db9b060a32e85d5e72092c01ae4a4a9f1eb564
+    # MLD é o algoritmo que corresponde a osrm-partition + osrm-customize.
+    command: osrm-routed --algorithm mld /data/campus.osrm
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data:ro
+
 volumes:
   postgres_data:
   minio_data:
