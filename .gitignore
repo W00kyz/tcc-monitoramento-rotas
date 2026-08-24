@@ -1,0 +1,24 @@
+# Artefatos gerados por IA — nunca versionar.
+# Servem como referência de trabalho em disco; a documentação que entra no
+# repositório é escrita pelo autor.
+docs/specs/
+docs/plano/
+docs/adrs/
+docs/ESTADO_DA_SESSAO.md
+
+# Superpowers e ferramental de agente
+.claude/
+.superpowers/
+docs/superpowers/
+CLAUDE.local.md
+
+# Artefatos grandes de infraestrutura — gerados por script, nunca commitados
+infra/data/
+*.pmtiles
+*.osm.pbf
+*.osrm*
+
+# Ambiente
+.env
+.env.*
+!.env.sample
