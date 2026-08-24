@@ -1,0 +1,9 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/W00kyz/tcc-backend.git
+[submodule "dashboard"]
+	path = dashboard
+	url = https://github.com/W00kyz/tcc-dashboard.git
+[submodule "mobile"]
+	path = mobile
+	url = https://github.com/W00kyz/tcc-mobile.git
