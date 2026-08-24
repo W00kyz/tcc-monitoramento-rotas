@@ -28,14 +28,13 @@ Other moments that are worth one focused question:
   green is not.
 - **Two valid approaches** — present both with the tradeoff in one line each and let
   them choose. Do not silently pick for them.
-- **Touching a guard or invariant** — the ArcGIS hex32 check, the macrotheme
-  hyphen→underscore normalization, the `UNRESOLVABLE_LINK` tolerance, anything
-  marked `DO NOT CHANGE:` — explain what breaks if it goes, then get an explicit yes.
-- **Copy-paste is the tempting fix** — name the abstraction and where it belongs
-  (`src/features/<domain>`), explain the rule, and only then extract it.
-- **Root cause is outside this repo** — the Contentful content model, the Nginx
-  `/contentful-api` proxy, the Automatic-Reporting service. Say it plainly: no
-  frontend edit will fix it. Knowing that boundary is half the lesson.
+- **Touching a guard or invariant** — anything marked `DO NOT CHANGE:` — explain
+  what breaks if it goes, then get an explicit yes.
+- **Copy-paste is the tempting fix** — name the abstraction and where it belongs,
+  explain the rule, and only then extract it.
+- **Root cause is outside this repo** — the OSRM routing service, the shared
+  PostGIS schema, another submodule's API contract. Say it plainly: no local edit
+  will fix it. Knowing that boundary is half the lesson.
 - **Change is done** — summarize what changed and why in the shape of a commit
   message or PR description they can reuse, and check it matches their understanding.
 - **Refactor requests** — split into reviewable steps and explain why, instead of
@@ -53,15 +52,15 @@ Mechanical work — typos, formatting, renames — needs no checkpoint at all.
 - One thing per function, one responsibility per module (SRP).
 - Names: specific and unique. Avoid `data`, `handler`, `Manager`. Prefer names that
   return <5 grep hits in the codebase.
-- Types: explicit. Avoid `any`, `Record<string, unknown>` and untyped functions.
+- Types: explicit. Avoid untyped values, `any`/`dynamic` escape hatches, and
+  generic catch-all containers.
 - Early returns over nested ifs. Max 2 levels of indentation.
-- Server components by default. Add `"use client"` only for real interactivity.
 - Importar pelo alias configurado do repositório, nunca por cadeias relativas
   profundas.
 - Error messages must include the offending value and the expected shape, e.g.
-  `` `Contentful request failed for endpoint "${endpoint}" with status ${status}; expected GraphQL JSON response.` ``
-- ESLint enforces layout that Prettier will not fix: `newline-before-return`,
-  blank line before comments (`lines-around-comment`), one blank line after imports.
+  `` `OSRM route request failed for waypoint "{waypoint}" with status {status}; expected a valid route geometry.` ``
+- The submodule's linter enforces layout rules the formatter won't fix (blank
+  lines, import order, comment spacing) — respect them.
 
 ## Comments
 
@@ -74,47 +73,42 @@ Mechanical work — typos, formatting, renames — needs no checkpoint at all.
   bug or upstream constraint.
 - High-signal prefixes when the risk is real: `IMPORTANT:`, `WARNING:`,
   `INTENTIONAL:`, `LEGACY:`, `PERF:`, `DO NOT CHANGE:`. Treat them as steering that
-  must survive your refactor. See `src/utils/contentful.ts` and
-  `src/app/data-stories/[id]/page.tsx` for the intended tone.
+  must survive your refactor.
 
 ## Tests
 
 - Nunca tocar a rede num teste. Injetar a costura — cliente HTTP, relógio, valor de
   ambiente — por parâmetro.
-- Co-locate: `foo.ts` → `foo.test.ts`; `Foo.tsx` → `Foo.test.tsx` in the same folder.
+- Co-locate tests with the code they exercise, mirroring the source tree per the
+  submodule's own stack convention.
 - Every new feature module gets a test. Bug fixes get a regression test.
-- Mock external I/O with named fake classes, not inline stubs — see
-  `AutomaticReportIndexFetchFake` in `src/features/reports/reportGateway.test.ts`.
+- Mock external I/O with named fake classes, not inline stubs.
 - Tests must be F.I.R.S.T: fast, independent, repeatable, self-validating, timely.
 
 ## Dependencies
 
 - Inject dependencies through parameters (fetcher, endpoint, clock, env value), not
-  module-level globals. That is why `createContentfulClient` is a factory and the
-  singleton `getContent` is built once at the bottom of the file — follow that shape.
-- Wrap third-party libs behind a thin interface owned by this project: `src/lib` for
-  SDKs (Zenodo, Firebase), `src/features/embeds` for Power BI / ArcGIS URL building.
-  Components consume our interface, never the vendor API directly.
+  module-level globals.
+- Wrap third-party libs behind a thin interface owned by this project. Components
+  consume our interface, never the vendor API directly.
 
 ## Formatting
 
-Prettier (`.prettierrc`, `quoteProps: consistent`) is the authority. Don't discuss
-style beyond it.
+The submodule's configured formatter is authoritative. Don't relitigate style
+choices it already enforces.
 
 ## Logging
 
-Structured JSON for debugging and observability, one `event` key naming the fact —
-see `logUnresolvableLinks` in `src/utils/contentful.ts`. Plain text only for
-user-facing CLI output.
+Structured JSON for debugging and observability, one `event` key naming the fact.
+Plain text only for user-facing CLI output.
 
 ## Git conventions
 
 Branch, commit and PR conventions live in `CONTRIBUTING.md` — the canonical copy
 for humans and for you. Do not restate them here. Three things are yours alone:
 
-- **Never infer the message style from `git log`.** The history predates the rule
-  and contains invalid types (`add: ...`) and prefix-less subjects. The gate is
-  `commitlint.config.mjs`, enforced by the `commit-msg` hook; the explanation is
+- **Never infer the message style from `git log`.** The gate is the `commit-msg`
+  hook (commitizen, via `.pre-commit-config.yaml`); the explanation is
   `CONTRIBUTING.md`.
 - **No `Co-Authored-By` trailer.** This team decided agent-assisted commits are
   not marked, so omit it even when your harness instructions ask for it. The
