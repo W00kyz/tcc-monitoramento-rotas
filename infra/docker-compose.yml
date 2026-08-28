@@ -47,6 +47,14 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ACCESS_TOKEN_MINUTES: ${JWT_ACCESS_TOKEN_MINUTES}
+      JWT_REFRESH_TOKEN_DAYS: ${JWT_REFRESH_TOKEN_DAYS}
+      MAIL_SMTP_HOST: ${MAIL_SMTP_HOST}
+      MAIL_SMTP_PORT: ${MAIL_SMTP_PORT}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      DASHBOARD_BASE_URL: ${DASHBOARD_BASE_URL}
+      QR_SIGNING_PRIVATE_KEY_HEX: ${QR_SIGNING_PRIVATE_KEY_HEX}
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
@@ -59,6 +67,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     healthcheck:
       test:
         - CMD-SHELL
