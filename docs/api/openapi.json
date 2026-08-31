@@ -200,15 +200,178 @@
         }
       }
     },
-    "/routes/me": {
+    "/routes": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Create Route Endpoint",
+        "operationId": "create_route_endpoint_routes_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteCreateBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "routes"
         ],
-        "summary": "List My Routes",
-        "operationId": "list_my_routes_routes_me_get",
+        "summary": "List Routes",
+        "operationId": "list_routes_routes_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date"
+            }
+          },
+          {
+            "name": "field_worker_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Field Worker Id"
+            }
+          },
+          {
+            "name": "route_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
         "responses": {
           "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RouteOut"
+                  },
+                  "title": "Response List Routes Routes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/routes/occasional": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Create Occasional Routes",
+        "description": "RF23 / spec §3.5 Ruling 2 — an occasional route assigned to N workers is N independent\nroutes, one per worker, each a copy of the same stops. One transaction: if any worker id\nis unknown, nothing is committed.",
+        "operationId": "create_occasional_routes_routes_occasional_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OccasionalRouteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -217,7 +380,17 @@
                     "$ref": "#/components/schemas/RouteOut"
                   },
                   "type": "array",
-                  "title": "Response List My Routes Routes Me Get"
+                  "title": "Response Create Occasional Routes Routes Occasional Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -230,34 +403,332 @@
         ]
       }
     },
-    "/routes": {
+    "/routes/me": {
       "get": {
         "tags": [
           "routes"
         ],
-        "summary": "List All Routes",
-        "operationId": "list_all_routes_routes_get",
+        "summary": "List My Routes",
+        "description": "RF27 \"rota do dia\": the mobile feed for the signed-in worker. Same `RouteOut` shape the\nmanager endpoints return, so mobile and the dashboard render a route identically. Without\n`?date=` it defaults to today; CANCELLED routes are never shown.",
+        "operationId": "list_my_routes_routes_me_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/RouteOut"
                   },
-                  "type": "array",
-                  "title": "Response List All Routes Routes Get"
+                  "title": "Response List My Routes Routes Me Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/routes/{route_id}": {
+      "get": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Get Route",
+        "operationId": "get_route_routes__route_id__get",
         "security": [
           {
             "HTTPBearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Patch Route",
+        "operationId": "patch_route_routes__route_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteUpdateBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/routes/{route_id}/optimize": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Optimize Route Endpoint",
+        "operationId": "optimize_route_endpoint_routes__route_id__optimize_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/routes/{route_id}/reassign": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Reassign Route Endpoint",
+        "operationId": "reassign_route_endpoint_routes__route_id__reassign_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReassignBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/routes/{route_id}/cancel": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Cancel Route Endpoint",
+        "operationId": "cancel_route_endpoint_routes__route_id__cancel_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/routes/{route_id}/start": {
@@ -296,6 +767,242 @@
         },
         "responses": {
           "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/route-templates": {
+      "get": {
+        "tags": [
+          "route-templates"
+        ],
+        "summary": "List Route Templates",
+        "operationId": "list_route_templates_route_templates_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Route Templates Route Templates Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "route-templates"
+        ],
+        "summary": "Create Route Template",
+        "operationId": "create_route_template_route_templates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreateBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/route-templates/{template_id}": {
+      "get": {
+        "tags": [
+          "route-templates"
+        ],
+        "summary": "Get Route Template",
+        "operationId": "get_route_template_route_templates__template_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "route-templates"
+        ],
+        "summary": "Update Route Template",
+        "operationId": "update_route_template_route_templates__template_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdateBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/route-templates/{template_id}/materialize": {
+      "post": {
+        "tags": [
+          "route-templates"
+        ],
+        "summary": "Materialize Route Template",
+        "operationId": "materialize_route_template_route_templates__template_id__materialize_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterializeBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -1907,6 +2614,21 @@
         ],
         "title": "BuildingUpdateRequest"
       },
+      "CancelBody": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "CancelBody"
+      },
       "CheckInRequest": {
         "properties": {
           "route_stop_id": {
@@ -2377,6 +3099,76 @@
         ],
         "title": "LoginRequest"
       },
+      "MaterializeBody": {
+        "properties": {
+          "route_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Route Date"
+          },
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_date"
+        ],
+        "title": "MaterializeBody"
+      },
+      "OccasionalRouteBody": {
+        "properties": {
+          "field_worker_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Field Worker Ids"
+          },
+          "route_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Route Date"
+          },
+          "scheduled_start_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled Start At"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/StopBody"
+            },
+            "type": "array",
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_ids",
+          "route_date",
+          "stops"
+        ],
+        "title": "OccasionalRouteBody"
+      },
       "PasswordResetConfirm": {
         "properties": {
           "token": {
@@ -2452,6 +3244,27 @@
         ],
         "title": "QrCodeOut"
       },
+      "ReassignBody": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "reason"
+        ],
+        "title": "ReassignBody"
+      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -2478,6 +3291,55 @@
         ],
         "title": "RevokeQrCodeRequest"
       },
+      "RouteCreateBody": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "route_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Route Date"
+          },
+          "route_type": {
+            "type": "string",
+            "enum": [
+              "REGULAR",
+              "OCCASIONAL"
+            ],
+            "title": "Route Type",
+            "default": "REGULAR"
+          },
+          "scheduled_start_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled Start At"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/StopBody"
+            },
+            "type": "array",
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "route_date",
+          "stops"
+        ],
+        "title": "RouteCreateBody"
+      },
       "RouteOut": {
         "properties": {
           "id": {
@@ -2485,9 +3347,27 @@
             "format": "uuid",
             "title": "Id"
           },
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
           "field_worker_name": {
             "type": "string",
             "title": "Field Worker Name"
+          },
+          "route_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Route Date"
+          },
+          "route_type": {
+            "type": "string",
+            "title": "Route Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
           },
           "scheduled_start_at": {
             "anyOf": [
@@ -2513,6 +3393,10 @@
             ],
             "title": "Started At"
           },
+          "routing_degraded": {
+            "type": "boolean",
+            "title": "Routing Degraded"
+          },
           "stops": {
             "items": {
               "$ref": "#/components/schemas/RouteStopOut"
@@ -2524,9 +3408,14 @@
         "type": "object",
         "required": [
           "id",
+          "field_worker_id",
           "field_worker_name",
+          "route_date",
+          "route_type",
+          "status",
           "scheduled_start_at",
           "started_at",
+          "routing_degraded",
           "stops"
         ],
         "title": "RouteOut"
@@ -2546,9 +3435,97 @@
             "type": "string",
             "title": "Status"
           },
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
           "service_point_name": {
             "type": "string",
             "title": "Service Point Name"
+          },
+          "floor_label": {
+            "type": "string",
+            "title": "Floor Label"
+          },
+          "building_name": {
+            "type": "string",
+            "title": "Building Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "point_type": {
+            "type": "string",
+            "title": "Point Type"
+          },
+          "expected_arrival_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival From"
+          },
+          "expected_arrival_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival To"
+          },
+          "distance_from_prev_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance From Prev M"
+          },
+          "duration_from_prev_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration From Prev S"
+          },
+          "leg_geometry": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leg Geometry"
           }
         },
         "type": "object",
@@ -2556,9 +3533,76 @@
           "id",
           "order_index",
           "status",
-          "service_point_name"
+          "service_point_id",
+          "service_point_name",
+          "floor_label",
+          "building_name",
+          "latitude",
+          "longitude",
+          "point_type",
+          "expected_arrival_from",
+          "expected_arrival_to",
+          "distance_from_prev_m",
+          "duration_from_prev_s",
+          "leg_geometry"
         ],
         "title": "RouteStopOut"
+      },
+      "RouteUpdateBody": {
+        "properties": {
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          },
+          "route_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Date"
+          },
+          "scheduled_start_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled Start At"
+          },
+          "stops": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StopBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "title": "RouteUpdateBody"
       },
       "ServicePointCreateRequest": {
         "properties": {
@@ -2778,6 +3822,360 @@
           "started_at"
         ],
         "title": "StartRouteRequest"
+      },
+      "StopBody": {
+        "properties": {
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "expected_arrival_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival From"
+          },
+          "expected_arrival_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_point_id"
+        ],
+        "title": "StopBody"
+      },
+      "TemplateCreateBody": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          },
+          "recurrence": {
+            "type": "string",
+            "enum": [
+              "DAILY",
+              "WEEKLY"
+            ],
+            "title": "Recurrence"
+          },
+          "weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekdays"
+          },
+          "route_type": {
+            "type": "string",
+            "enum": [
+              "REGULAR",
+              "OCCASIONAL"
+            ],
+            "title": "Route Type",
+            "default": "REGULAR"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateStopBody"
+            },
+            "type": "array",
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "recurrence",
+          "stops"
+        ],
+        "title": "TemplateCreateBody"
+      },
+      "TemplateOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          },
+          "recurrence": {
+            "type": "string",
+            "title": "Recurrence"
+          },
+          "weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekdays"
+          },
+          "route_type": {
+            "type": "string",
+            "title": "Route Type"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateStopOut"
+            },
+            "type": "array",
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "field_worker_id",
+          "recurrence",
+          "weekdays",
+          "route_type",
+          "is_active",
+          "stops"
+        ],
+        "title": "TemplateOut"
+      },
+      "TemplateStopBody": {
+        "properties": {
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "expected_arrival_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival From"
+          },
+          "expected_arrival_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_point_id"
+        ],
+        "title": "TemplateStopBody"
+      },
+      "TemplateStopOut": {
+        "properties": {
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "order_index": {
+            "type": "integer",
+            "title": "Order Index"
+          },
+          "expected_arrival_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival From"
+          },
+          "expected_arrival_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Arrival To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_point_id",
+          "order_index",
+          "expected_arrival_from",
+          "expected_arrival_to"
+        ],
+        "title": "TemplateStopOut"
+      },
+      "TemplateUpdateBody": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          },
+          "recurrence": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "DAILY",
+                  "WEEKLY"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence"
+          },
+          "weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekdays"
+          },
+          "route_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "REGULAR",
+                  "OCCASIONAL"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Type"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "stops": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TemplateStopBody"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stops"
+          }
+        },
+        "type": "object",
+        "title": "TemplateUpdateBody"
       },
       "TokenResponse": {
         "properties": {
