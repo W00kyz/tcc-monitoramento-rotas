@@ -55,6 +55,7 @@ services:
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
       DASHBOARD_BASE_URL: ${DASHBOARD_BASE_URL}
       QR_SIGNING_PRIVATE_KEY_HEX: ${QR_SIGNING_PRIVATE_KEY_HEX}
+      OSRM_BASE_URL: ${OSRM_BASE_URL}
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
@@ -68,6 +69,8 @@ services:
       minio:
         condition: service_healthy
       mailpit:
+        condition: service_started
+      osrm:
         condition: service_started
     healthcheck:
       test:
