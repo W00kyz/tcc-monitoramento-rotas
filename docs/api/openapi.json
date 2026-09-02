@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "UFCG Service Route Monitoring API",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "paths": {
     "/health": {
@@ -789,6 +789,75 @@
         }
       }
     },
+    "/routes/{route_id}/stops/{stop_id}/complete-manually": {
+      "post": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "Complete Stop Manually",
+        "description": "RF53 — a manager closes a stop the worker could not reach, with a reason and no\nevidence. `complete_manually` owns and commits its own transaction (the execution module\nexception to \"service flushes, never commits\"); the audit trail is appended in a second\ntransaction afterwards, exactly as `start_route` does.",
+        "operationId": "complete_stop_manually_routes__route_id__stops__stop_id__complete_manually_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          },
+          {
+            "name": "stop_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Stop Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteManuallyBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/route-templates": {
       "get": {
         "tags": [
@@ -1069,6 +1138,586 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/check-outs": {
+      "post": {
+        "tags": [
+          "execution"
+        ],
+        "summary": "Create Check Out",
+        "operationId": "create_check_out_check_outs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckOutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckOutResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/executions/{execution_id}/evidence/photo": {
+      "post": {
+        "tags": [
+          "evidence"
+        ],
+        "summary": "Upload Photo",
+        "operationId": "upload_photo_executions__execution_id__evidence_photo_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_photo_executions__execution_id__evidence_photo_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceItemOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions/{execution_id}/evidence/note": {
+      "post": {
+        "tags": [
+          "evidence"
+        ],
+        "summary": "Upload Note",
+        "operationId": "upload_note_executions__execution_id__evidence_note_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidenceNoteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceItemOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions/{execution_id}/evidence": {
+      "get": {
+        "tags": [
+          "evidence"
+        ],
+        "summary": "List Execution Evidence",
+        "operationId": "list_execution_evidence_executions__execution_id__evidence_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EvidenceItemOut"
+                  },
+                  "title": "Response List Execution Evidence Executions  Execution Id  Evidence Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evidence/{evidence_id}/content": {
+      "get": {
+        "tags": [
+          "evidence"
+        ],
+        "summary": "Get Evidence Content",
+        "operationId": "get_evidence_content_evidence__evidence_id__content_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "evidence_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evidence Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions": {
+      "get": {
+        "tags": [
+          "execution"
+        ],
+        "summary": "List Execution History",
+        "operationId": "list_execution_history_executions_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "field_worker_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Field Worker Id"
+            }
+          },
+          {
+            "name": "service_point_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Point Id"
+            }
+          },
+          {
+            "name": "building_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
+            }
+          },
+          {
+            "name": "review_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "name": "geo_validation",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Geo Validation"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          },
+          {
+            "name": "route_stop_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route Stop Status"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedExecutions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions/{execution_id}": {
+      "get": {
+        "tags": [
+          "execution"
+        ],
+        "summary": "Get Execution",
+        "operationId": "get_execution_executions__execution_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions/{execution_id}/review/resolve": {
+      "post": {
+        "tags": [
+          "execution"
+        ],
+        "summary": "Resolve Execution Review",
+        "operationId": "resolve_execution_review_executions__execution_id__review_resolve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ResolveReviewRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/users": {
@@ -2532,6 +3181,76 @@
           }
         }
       }
+    },
+    "/settings": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Get Settings Endpoint",
+        "operationId": "get_settings_endpoint_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Put Settings Endpoint",
+        "operationId": "put_settings_endpoint_settings_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -2553,6 +3272,31 @@
           "access_token"
         ],
         "title": "AccessTokenResponse"
+      },
+      "Body_upload_photo_executions__execution_id__evidence_photo_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "sha256",
+          "captured_at"
+        ],
+        "title": "Body_upload_photo_executions__execution_id__evidence_photo_post"
       },
       "BuildingCreateRequest": {
         "properties": {
@@ -2631,21 +3375,30 @@
       },
       "CheckInRequest": {
         "properties": {
-          "route_stop_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Route Stop Id"
-          },
           "qr_payload": {
             "type": "string",
             "title": "Qr Payload"
           },
           "latitude": {
-            "type": "number",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Latitude"
           },
           "longitude": {
-            "type": "number",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Longitude"
           },
           "scanned_at": {
@@ -2657,14 +3410,23 @@
             "type": "string",
             "format": "uuid",
             "title": "Idempotency Key"
+          },
+          "route_stop_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Stop Id"
           }
         },
         "type": "object",
         "required": [
-          "route_stop_id",
           "qr_payload",
-          "latitude",
-          "longitude",
           "scanned_at",
           "idempotency_key"
         ],
@@ -2677,18 +3439,149 @@
             "format": "uuid",
             "title": "Execution Id"
           },
-          "checked_in_at": {
+          "route_stop_id": {
             "type": "string",
-            "format": "date-time",
-            "title": "Checked In At"
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "geo_validation": {
+            "type": "string",
+            "title": "Geo Validation"
+          },
+          "validation_flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Flags"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
           }
         },
         "type": "object",
         "required": [
           "execution_id",
-          "checked_in_at"
+          "route_stop_id",
+          "geo_validation",
+          "validation_flags",
+          "review_status"
         ],
         "title": "CheckInResponse"
+      },
+      "CheckOutRequest": {
+        "properties": {
+          "qr_payload": {
+            "type": "string",
+            "title": "Qr Payload"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "scanned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scanned At"
+          },
+          "checkout_idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Checkout Idempotency Key"
+          },
+          "route_stop_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Stop Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "qr_payload",
+          "scanned_at",
+          "checkout_idempotency_key"
+        ],
+        "title": "CheckOutRequest"
+      },
+      "CheckOutResponse": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "checked_out_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked Out At"
+          },
+          "validation_flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Flags"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "route_stop_id",
+          "checked_out_at",
+          "validation_flags",
+          "review_status"
+        ],
+        "title": "CheckOutResponse"
+      },
+      "CompleteManuallyBody": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "CompleteManuallyBody"
       },
       "ContractorCompanyCreateRequest": {
         "properties": {
@@ -2830,6 +3723,509 @@
           "valid_until"
         ],
         "title": "EventUpdateRequest"
+      },
+      "EvidenceItemOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "text_body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Body"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type"
+          },
+          "byte_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Byte Size"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "content_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "text_body",
+          "captured_at",
+          "content_type",
+          "byte_size",
+          "created_at",
+          "content_url"
+        ],
+        "title": "EvidenceItemOut"
+      },
+      "EvidenceNoteRequest": {
+        "properties": {
+          "text_body": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text Body"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text_body",
+          "captured_at"
+        ],
+        "title": "EvidenceNoteRequest"
+      },
+      "ExecutionDetail": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "field_worker_name": {
+            "type": "string",
+            "title": "Field Worker Name"
+          },
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "service_point_name": {
+            "type": "string",
+            "title": "Service Point Name"
+          },
+          "building_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Building Id"
+          },
+          "building_name": {
+            "type": "string",
+            "title": "Building Name"
+          },
+          "floor_label": {
+            "type": "string",
+            "title": "Floor Label"
+          },
+          "checked_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked In At"
+          },
+          "checked_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked Out At"
+          },
+          "geo_validation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geo Validation"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
+          },
+          "validation_flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Flags"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "evidence_count": {
+            "type": "integer",
+            "title": "Evidence Count"
+          },
+          "route_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Id"
+          },
+          "scans": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionScan"
+            },
+            "type": "array",
+            "title": "Scans"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionEvidence"
+            },
+            "type": "array",
+            "title": "Evidence"
+          },
+          "manual_completion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ManualCompletionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "field_worker_id",
+          "field_worker_name",
+          "service_point_id",
+          "service_point_name",
+          "building_id",
+          "building_name",
+          "floor_label",
+          "checked_in_at",
+          "checked_out_at",
+          "geo_validation",
+          "review_status",
+          "validation_flags",
+          "source",
+          "evidence_count",
+          "route_id",
+          "scans",
+          "evidence",
+          "manual_completion"
+        ],
+        "title": "ExecutionDetail"
+      },
+      "ExecutionEvidence": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "text_body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Body"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type"
+          },
+          "byte_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Byte Size"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "content_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "text_body",
+          "content_type",
+          "byte_size",
+          "captured_at",
+          "created_at",
+          "content_url"
+        ],
+        "title": "ExecutionEvidence"
+      },
+      "ExecutionListItem": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "field_worker_name": {
+            "type": "string",
+            "title": "Field Worker Name"
+          },
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "service_point_name": {
+            "type": "string",
+            "title": "Service Point Name"
+          },
+          "building_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Building Id"
+          },
+          "building_name": {
+            "type": "string",
+            "title": "Building Name"
+          },
+          "floor_label": {
+            "type": "string",
+            "title": "Floor Label"
+          },
+          "checked_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked In At"
+          },
+          "checked_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked Out At"
+          },
+          "geo_validation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geo Validation"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
+          },
+          "validation_flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Flags"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "evidence_count": {
+            "type": "integer",
+            "title": "Evidence Count"
+          },
+          "route_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "field_worker_id",
+          "field_worker_name",
+          "service_point_id",
+          "service_point_name",
+          "building_id",
+          "building_name",
+          "floor_label",
+          "checked_in_at",
+          "checked_out_at",
+          "geo_validation",
+          "review_status",
+          "validation_flags",
+          "source",
+          "evidence_count",
+          "route_id"
+        ],
+        "title": "ExecutionListItem"
+      },
+      "ExecutionScan": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "geo_validation": {
+            "type": "string",
+            "title": "Geo Validation"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance M"
+          },
+          "service_point_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Point Id"
+          },
+          "scanned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scanned At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "geo_validation",
+          "latitude",
+          "longitude",
+          "distance_m",
+          "service_point_id",
+          "scanned_at"
+        ],
+        "title": "ExecutionScan"
       },
       "FieldWorkerCreateRequest": {
         "properties": {
@@ -3099,6 +4495,31 @@
         ],
         "title": "LoginRequest"
       },
+      "ManualCompletionOut": {
+        "properties": {
+          "completed_by": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Completed By"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "completed_by",
+          "reason",
+          "completed_at"
+        ],
+        "title": "ManualCompletionOut"
+      },
       "MaterializeBody": {
         "properties": {
           "route_date": {
@@ -3168,6 +4589,37 @@
           "stops"
         ],
         "title": "OccasionalRouteBody"
+      },
+      "PagedExecutions": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "PagedExecutions"
       },
       "PasswordResetConfirm": {
         "properties": {
@@ -3277,6 +4729,23 @@
           "refresh_token"
         ],
         "title": "RefreshRequest"
+      },
+      "ResolveReviewRequest": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "ResolveReviewRequest"
       },
       "RevokeQrCodeRequest": {
         "properties": {
@@ -3798,6 +5267,47 @@
           "average_duration_minutes"
         ],
         "title": "ServiceTypeUpdateRequest"
+      },
+      "SettingsOut": {
+        "properties": {
+          "check_radius_meters": {
+            "type": "integer",
+            "title": "Check Radius Meters"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "check_radius_meters",
+          "updated_at"
+        ],
+        "title": "SettingsOut"
+      },
+      "SettingsUpdate": {
+        "properties": {
+          "check_radius_meters": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Check Radius Meters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "check_radius_meters"
+        ],
+        "title": "SettingsUpdate"
       },
       "StartRouteRequest": {
         "properties": {
