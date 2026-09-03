@@ -22,3 +22,6 @@ infra/data/
 .env
 .env.*
 !.env.sample
+
+# Scratch de sessão (agente) — nunca versionado
+/scratchpad/
