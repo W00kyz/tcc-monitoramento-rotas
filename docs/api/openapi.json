@@ -3288,13 +3288,19 @@
             "type": "string",
             "format": "date-time",
             "title": "Captured At"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Idempotency Key"
           }
         },
         "type": "object",
         "required": [
           "file",
           "sha256",
-          "captured_at"
+          "captured_at",
+          "idempotency_key"
         ],
         "title": "Body_upload_photo_executions__execution_id__evidence_photo_post"
       },
@@ -3422,6 +3428,29 @@
               }
             ],
             "title": "Route Stop Id"
+          },
+          "execution_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Id"
+          },
+          "client_clock_offset_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Clock Offset Seconds"
           }
         },
         "type": "object",
@@ -3519,6 +3548,29 @@
               }
             ],
             "title": "Route Stop Id"
+          },
+          "execution_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Id"
+          },
+          "client_clock_offset_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Clock Offset Seconds"
           }
         },
         "type": "object",
@@ -3815,12 +3867,18 @@
             "type": "string",
             "format": "date-time",
             "title": "Captured At"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Idempotency Key"
           }
         },
         "type": "object",
         "required": [
           "text_body",
-          "captured_at"
+          "captured_at",
+          "idempotency_key"
         ],
         "title": "EvidenceNoteRequest"
       },
@@ -3914,6 +3972,17 @@
             "format": "uuid",
             "title": "Route Id"
           },
+          "clock_skew_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clock Skew Seconds"
+          },
           "scans": {
             "items": {
               "$ref": "#/components/schemas/ExecutionScan"
@@ -3957,6 +4026,7 @@
           "source",
           "evidence_count",
           "route_id",
+          "clock_skew_seconds",
           "scans",
           "evidence",
           "manual_completion"
@@ -4131,6 +4201,17 @@
             "type": "string",
             "format": "uuid",
             "title": "Route Id"
+          },
+          "clock_skew_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clock Skew Seconds"
           }
         },
         "type": "object",
@@ -4150,7 +4231,8 @@
           "validation_flags",
           "source",
           "evidence_count",
-          "route_id"
+          "route_id",
+          "clock_skew_seconds"
         ],
         "title": "ExecutionListItem"
       },
