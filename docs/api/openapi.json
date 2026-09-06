@@ -3927,6 +3927,60 @@
         ],
         "title": "AnswerOut"
       },
+      "AssignmentOut": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "sequence": {
+            "type": "integer",
+            "title": "Sequence"
+          },
+          "assigned_by_name": {
+            "type": "string",
+            "title": "Assigned By Name"
+          },
+          "transfer_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transfer Reason"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "full_name",
+          "sequence",
+          "assigned_by_name",
+          "transfer_reason",
+          "outcome"
+        ],
+        "title": "AssignmentOut",
+        "description": "One row of a stop's append-only `stop_assignments` chain (spec §3.4, RF21). Shipped\nin `assignment_history` only when the stop was reassigned at least once; the manager\npanel (Task 8) renders it, the mobile app ignores the field."
+      },
       "Body_upload_photo_executions__execution_id__evidence_photo_post": {
         "properties": {
           "file": {
@@ -6309,6 +6363,24 @@
                 "type": "null"
               }
             ]
+          },
+          "reassigned": {
+            "type": "boolean",
+            "title": "Reassigned"
+          },
+          "assignment_history": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AssignmentOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment History"
           }
         },
         "type": "object",
@@ -6330,7 +6402,9 @@
           "leg_geometry",
           "service_type_id",
           "service_type_name",
-          "form"
+          "form",
+          "reassigned",
+          "assignment_history"
         ],
         "title": "RouteStopOut"
       },
