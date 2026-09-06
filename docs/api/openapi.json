@@ -4639,6 +4639,60 @@
         ],
         "title": "EvidenceNoteRequest"
       },
+      "ExecutionAssignmentOut": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "sequence": {
+            "type": "integer",
+            "title": "Sequence"
+          },
+          "assigned_by_name": {
+            "type": "string",
+            "title": "Assigned By Name"
+          },
+          "transfer_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transfer Reason"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "full_name",
+          "sequence",
+          "assigned_by_name",
+          "transfer_reason",
+          "outcome"
+        ],
+        "title": "ExecutionAssignmentOut",
+        "description": "One row of the stop's append-only assignment chain (RF21), surfaced on the execution\ndetail so the manager panel (Task 8) can show who was originally designated and why the\nstop moved. Named distinctly from `app.api.route_view.AssignmentOut`: FastAPI dedupes\nOpenAPI component schemas by class name, so two different classes sharing one name would\nsilently clobber each other in the contract (Task 5 hit this)."
+      },
       "ExecutionDetail": {
         "properties": {
           "execution_id": {
@@ -4782,6 +4836,24 @@
             },
             "type": "array",
             "title": "Answers"
+          },
+          "reassigned": {
+            "type": "boolean",
+            "title": "Reassigned"
+          },
+          "assignment_history": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExecutionAssignmentOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment History"
           }
         },
         "type": "object",
@@ -4807,7 +4879,9 @@
           "evidence",
           "manual_completion",
           "form_version_id",
-          "answers"
+          "answers",
+          "reassigned",
+          "assignment_history"
         ],
         "title": "ExecutionDetail"
       },
