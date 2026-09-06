@@ -3587,6 +3587,278 @@
           }
         }
       }
+    },
+    "/routes/{route_id}/impediments": {
+      "post": {
+        "tags": [
+          "impediments"
+        ],
+        "summary": "Report Impediment",
+        "description": "RF16-RF17 — the field worker signals they cannot execute this stop (scope=STOP) or the\nrest of the route (scope=ROUTE_REMAINDER). The report is the record; no audit-trail entry\nis appended here (nothing on the assignment chain moved yet).",
+        "operationId": "report_impediment_routes__route_id__impediments_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "route_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpedimentReportBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpedimentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impediments": {
+      "get": {
+        "tags": [
+          "impediments"
+        ],
+        "summary": "List Impediments",
+        "description": "The manager's queue. Only the PENDING queue is served — the impediment domain keeps no\nother list — so any other `?status=` value is a client error, not an empty list.",
+        "operationId": "list_impediments_impediments_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "PENDING",
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImpedimentOut"
+                  },
+                  "title": "Response List Impediments Impediments Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impediments/{impediment_id}/candidates": {
+      "get": {
+        "tags": [
+          "impediments"
+        ],
+        "summary": "List Candidates",
+        "operationId": "list_candidates_impediments__impediment_id__candidates_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "impediment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Impediment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReassignCandidateOut"
+                  },
+                  "title": "Response List Candidates Impediments  Impediment Id  Candidates Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impediments/{impediment_id}/reassign": {
+      "post": {
+        "tags": [
+          "impediments"
+        ],
+        "summary": "Reassign",
+        "description": "RF18-RF21 — move the impediment's affected stop(s) onto `field_worker_id`'s route for\nthe same date and mark the impediment RESOLVED. `reassign_impediment` delegates the move\nto `reassign_stops`, which appends its own stop-assignment rows; this endpoint adds one\naudit-trail entry naming the manager's decision.",
+        "operationId": "reassign_impediments__impediment_id__reassign_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "impediment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Impediment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpedimentReassignBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpedimentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impediments/{impediment_id}/dismiss": {
+      "post": {
+        "tags": [
+          "impediments"
+        ],
+        "summary": "Dismiss",
+        "description": "Close the impediment with no reassignment (RF17) — a duplicate report, or one the\nmanager resolved off-system.",
+        "operationId": "dismiss_impediments__impediment_id__dismiss_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "impediment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Impediment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpedimentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5162,6 +5434,167 @@
         "title": "HealthResponse",
         "description": "Liveness payload consumed by Docker healthchecks and by CI smoke steps."
       },
+      "ImpedimentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "route_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Id"
+          },
+          "route_stop_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Stop Id"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ImpedimentScope"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/ImpedimentReason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ImpedimentStatus"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reported At"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Received At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "route_id",
+          "route_stop_id",
+          "scope",
+          "reason",
+          "note",
+          "status",
+          "reported_at",
+          "received_at"
+        ],
+        "title": "ImpedimentOut"
+      },
+      "ImpedimentReason": {
+        "type": "string",
+        "enum": [
+          "ACCESS_BLOCKED",
+          "SITE_REFUSAL",
+          "HEALTH_ISSUE",
+          "OTHER"
+        ],
+        "title": "ImpedimentReason"
+      },
+      "ImpedimentReassignBody": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "reason"
+        ],
+        "title": "ImpedimentReassignBody"
+      },
+      "ImpedimentReportBody": {
+        "properties": {
+          "route_stop_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Stop Id"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ImpedimentScope"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/ImpedimentReason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reported At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scope",
+          "reason",
+          "reported_at"
+        ],
+        "title": "ImpedimentReportBody"
+      },
+      "ImpedimentScope": {
+        "type": "string",
+        "enum": [
+          "STOP",
+          "ROUTE_REMAINDER"
+        ],
+        "title": "ImpedimentScope"
+      },
+      "ImpedimentStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "RESOLVED"
+        ],
+        "title": "ImpedimentStatus"
+      },
       "IssueQrCodeRequest": {
         "properties": {
           "reason": {
@@ -5518,6 +5951,35 @@
           "reason"
         ],
         "title": "ReassignBody"
+      },
+      "ReassignCandidateOut": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "distance_m": {
+            "type": "number",
+            "title": "Distance M"
+          },
+          "pending_stop_count": {
+            "type": "integer",
+            "title": "Pending Stop Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "full_name",
+          "distance_m",
+          "pending_stop_count"
+        ],
+        "title": "ReassignCandidateOut"
       },
       "RefreshRequest": {
         "properties": {
