@@ -4600,7 +4600,9 @@
           "threshold_minutes": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "integer",
+                "maximum": 1440.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
