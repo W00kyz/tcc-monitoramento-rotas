@@ -1482,6 +1482,23 @@
             }
           },
           {
+            "name": "service_type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Type Id"
+            }
+          },
+          {
             "name": "building_id",
             "in": "query",
             "required": false,
