@@ -3859,6 +3859,33 @@
           }
         }
       }
+    },
+    "/monitoring/board": {
+      "get": {
+        "tags": [
+          "monitoring"
+        ],
+        "summary": "Get Board",
+        "description": "RF41 — the coloured route board: every open route with its derived `is_delayed` flag and\nOPEN alert count, the board's alert list, and the latest GPS fix per worker.",
+        "operationId": "get_board_monitoring_board_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoardSnapshot"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -3880,6 +3907,25 @@
           "access_token"
         ],
         "title": "AccessTokenResponse"
+      },
+      "AlertKind": {
+        "type": "string",
+        "enum": [
+          "LATE_START",
+          "WORKER_ABSENT",
+          "LATE_STOP",
+          "NO_EVIDENCE"
+        ],
+        "title": "AlertKind"
+      },
+      "AlertStatus": {
+        "type": "string",
+        "enum": [
+          "OPEN",
+          "ACKNOWLEDGED",
+          "RESOLVED"
+        ],
+        "title": "AlertStatus"
       },
       "AnswerInBody": {
         "properties": {
@@ -3980,6 +4026,210 @@
         ],
         "title": "AssignmentOut",
         "description": "One row of a stop's append-only `stop_assignments` chain (spec §3.4, RF21). Shipped\nin `assignment_history` only when the stop was reassigned at least once; the manager\npanel (Task 8) renders it, the mobile app ignores the field."
+      },
+      "BoardAlert": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AlertKind"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "route_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Id"
+          },
+          "route_stop_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Stop Id"
+          },
+          "field_worker_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AlertStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "severity",
+          "description",
+          "route_id",
+          "route_stop_id",
+          "field_worker_id",
+          "status",
+          "created_at"
+        ],
+        "title": "BoardAlert"
+      },
+      "BoardPosition": {
+        "properties": {
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "field_worker_name": {
+            "type": "string",
+            "title": "Field Worker Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reported At"
+          },
+          "age_seconds": {
+            "type": "integer",
+            "title": "Age Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_id",
+          "field_worker_name",
+          "latitude",
+          "longitude",
+          "reported_at",
+          "age_seconds"
+        ],
+        "title": "BoardPosition"
+      },
+      "BoardRoute": {
+        "properties": {
+          "route_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Id"
+          },
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "field_worker_name": {
+            "type": "string",
+            "title": "Field Worker Name"
+          },
+          "route_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Route Date"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_delayed": {
+            "type": "boolean",
+            "title": "Is Delayed"
+          },
+          "open_alert_count": {
+            "type": "integer",
+            "title": "Open Alert Count"
+          },
+          "stop_total": {
+            "type": "integer",
+            "title": "Stop Total"
+          },
+          "stop_done": {
+            "type": "integer",
+            "title": "Stop Done"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_id",
+          "field_worker_id",
+          "field_worker_name",
+          "route_date",
+          "status",
+          "is_delayed",
+          "open_alert_count",
+          "stop_total",
+          "stop_done"
+        ],
+        "title": "BoardRoute"
+      },
+      "BoardSnapshot": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/BoardRoute"
+            },
+            "type": "array",
+            "title": "Routes"
+          },
+          "open_alerts": {
+            "items": {
+              "$ref": "#/components/schemas/BoardAlert"
+            },
+            "type": "array",
+            "title": "Open Alerts"
+          },
+          "worker_positions": {
+            "items": {
+              "$ref": "#/components/schemas/BoardPosition"
+            },
+            "type": "array",
+            "title": "Worker Positions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "routes",
+          "open_alerts",
+          "worker_positions"
+        ],
+        "title": "BoardSnapshot"
       },
       "Body_upload_photo_executions__execution_id__evidence_photo_post": {
         "properties": {
