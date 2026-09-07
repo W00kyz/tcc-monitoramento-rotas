@@ -3886,6 +3886,31 @@
           }
         ]
       }
+    },
+    "/monitoring/stream": {
+      "get": {
+        "tags": [
+          "monitoring"
+        ],
+        "summary": "Stream Board",
+        "description": "RF41 real-time — the same `BoardSnapshot` as `GET /monitoring/board`, pushed as\nServer-Sent Events whenever its meaningful content changes (spec §2 Ruling 4, §4).",
+        "operationId": "stream_board_monitoring_stream_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
