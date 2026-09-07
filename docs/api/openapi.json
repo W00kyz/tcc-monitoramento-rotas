@@ -4405,6 +4405,404 @@
           }
         ]
       }
+    },
+    "/reports/compliance": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Compliance Report",
+        "description": "RF45 — the route-compliance read model as JSON: the granularity buckets with the 13\nindicators plus `completion_rate`, a totals row, and the resolved `filters_applied`.",
+        "operationId": "get_compliance_report_reports_compliance_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ReportGranularity"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "field_worker_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Field Worker Id"
+            }
+          },
+          {
+            "name": "service_type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Type Id"
+            }
+          },
+          {
+            "name": "building_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
+            }
+          },
+          {
+            "name": "route_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/compliance.pdf": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Compliance Report Pdf",
+        "description": "RF46 — the same report rendered as a printable landscape-A4 PDF attachment.",
+        "operationId": "get_compliance_report_pdf_reports_compliance_pdf_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ReportGranularity"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "field_worker_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Field Worker Id"
+            }
+          },
+          {
+            "name": "service_type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Type Id"
+            }
+          },
+          {
+            "name": "building_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
+            }
+          },
+          {
+            "name": "route_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/compliance.xlsx": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Compliance Report Xlsx",
+        "description": "RF46 — the same report as an XLSX workbook attachment.",
+        "operationId": "get_compliance_report_xlsx_reports_compliance_xlsx_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ReportGranularity"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "field_worker_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Field Worker Id"
+            }
+          },
+          {
+            "name": "service_type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Type Id"
+            }
+          },
+          {
+            "name": "building_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
+            }
+          },
+          {
+            "name": "route_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Route Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5332,6 +5730,222 @@
         ],
         "title": "CompleteManuallyBody"
       },
+      "ComplianceReportOut": {
+        "properties": {
+          "granularity": {
+            "$ref": "#/components/schemas/ReportGranularity"
+          },
+          "date_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Date From"
+          },
+          "date_to": {
+            "type": "string",
+            "format": "date",
+            "title": "Date To"
+          },
+          "filters_applied": {
+            "$ref": "#/components/schemas/FilterAppliedOut"
+          },
+          "periods": {
+            "items": {
+              "$ref": "#/components/schemas/ComplianceRowOut"
+            },
+            "type": "array",
+            "title": "Periods"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/ComplianceTotalsOut"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "granularity",
+          "date_from",
+          "date_to",
+          "filters_applied",
+          "periods",
+          "totals",
+          "generated_at"
+        ],
+        "title": "ComplianceReportOut",
+        "description": "Mirror of `ComplianceReport`. The domain builder already returns frozen, JSON-serialisable\ndataclasses; this thin `...Out` layer (built via `model_validate`, `from_attributes=True`)\nkeeps the API schema explicit and decoupled from the dataclass without restating the query\nor re-deriving anything."
+      },
+      "ComplianceRowOut": {
+        "properties": {
+          "period_label": {
+            "type": "string",
+            "title": "Period Label"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "routes_total": {
+            "type": "integer",
+            "title": "Routes Total"
+          },
+          "routes_started": {
+            "type": "integer",
+            "title": "Routes Started"
+          },
+          "routes_completed": {
+            "type": "integer",
+            "title": "Routes Completed"
+          },
+          "routes_cancelled": {
+            "type": "integer",
+            "title": "Routes Cancelled"
+          },
+          "stops_total": {
+            "type": "integer",
+            "title": "Stops Total"
+          },
+          "stops_done": {
+            "type": "integer",
+            "title": "Stops Done"
+          },
+          "stops_pending": {
+            "type": "integer",
+            "title": "Stops Pending"
+          },
+          "stops_reassigned": {
+            "type": "integer",
+            "title": "Stops Reassigned"
+          },
+          "executions_total": {
+            "type": "integer",
+            "title": "Executions Total"
+          },
+          "executions_with_evidence": {
+            "type": "integer",
+            "title": "Executions With Evidence"
+          },
+          "executions_flagged": {
+            "type": "integer",
+            "title": "Executions Flagged"
+          },
+          "impediments_total": {
+            "type": "integer",
+            "title": "Impediments Total"
+          },
+          "alerts_total": {
+            "type": "integer",
+            "title": "Alerts Total"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period_label",
+          "period_start",
+          "routes_total",
+          "routes_started",
+          "routes_completed",
+          "routes_cancelled",
+          "stops_total",
+          "stops_done",
+          "stops_pending",
+          "stops_reassigned",
+          "executions_total",
+          "executions_with_evidence",
+          "executions_flagged",
+          "impediments_total",
+          "alerts_total",
+          "completion_rate"
+        ],
+        "title": "ComplianceRowOut",
+        "description": "Mirror of `ComplianceRow` — one granularity bucket with the 13 absolute indicators plus\nthe derived `completion_rate`."
+      },
+      "ComplianceTotalsOut": {
+        "properties": {
+          "routes_total": {
+            "type": "integer",
+            "title": "Routes Total"
+          },
+          "routes_started": {
+            "type": "integer",
+            "title": "Routes Started"
+          },
+          "routes_completed": {
+            "type": "integer",
+            "title": "Routes Completed"
+          },
+          "routes_cancelled": {
+            "type": "integer",
+            "title": "Routes Cancelled"
+          },
+          "stops_total": {
+            "type": "integer",
+            "title": "Stops Total"
+          },
+          "stops_done": {
+            "type": "integer",
+            "title": "Stops Done"
+          },
+          "stops_pending": {
+            "type": "integer",
+            "title": "Stops Pending"
+          },
+          "stops_reassigned": {
+            "type": "integer",
+            "title": "Stops Reassigned"
+          },
+          "executions_total": {
+            "type": "integer",
+            "title": "Executions Total"
+          },
+          "executions_with_evidence": {
+            "type": "integer",
+            "title": "Executions With Evidence"
+          },
+          "executions_flagged": {
+            "type": "integer",
+            "title": "Executions Flagged"
+          },
+          "impediments_total": {
+            "type": "integer",
+            "title": "Impediments Total"
+          },
+          "alerts_total": {
+            "type": "integer",
+            "title": "Alerts Total"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "routes_total",
+          "routes_started",
+          "routes_completed",
+          "routes_cancelled",
+          "stops_total",
+          "stops_done",
+          "stops_pending",
+          "stops_reassigned",
+          "executions_total",
+          "executions_with_evidence",
+          "executions_flagged",
+          "impediments_total",
+          "alerts_total",
+          "completion_rate"
+        ],
+        "title": "ComplianceTotalsOut",
+        "description": "Mirror of `ComplianceTotals` — the same shape as a row without the period identity."
+      },
       "ContractorCompanyCreateRequest": {
         "properties": {
           "name": {
@@ -6250,6 +6864,63 @@
           "service_type_ids"
         ],
         "title": "FieldWorkerUpdateRequest"
+      },
+      "FilterAppliedOut": {
+        "properties": {
+          "field_worker_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Worker Name"
+          },
+          "service_type_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Type Name"
+          },
+          "building_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Building Name"
+          },
+          "route_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_worker_name",
+          "service_type_name",
+          "building_name",
+          "route_status"
+        ],
+        "title": "FilterAppliedOut",
+        "description": "Mirror of `app.domain.reports.compliance.FilterApplied` — the human-readable echo of the\nfilters that were applied, with UUIDs already resolved to names by the builder."
       },
       "FloorCreateRequest": {
         "properties": {
@@ -7200,6 +7871,15 @@
           "stable_keys"
         ],
         "title": "ReorderBody"
+      },
+      "ReportGranularity": {
+        "type": "string",
+        "enum": [
+          "DAILY",
+          "WEEKLY",
+          "MONTHLY"
+        ],
+        "title": "ReportGranularity"
       },
       "ResolveReviewRequest": {
         "properties": {
