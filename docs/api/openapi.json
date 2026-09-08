@@ -127,6 +127,58 @@
         ]
       }
     },
+    "/auth/consent": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Accept Consent",
+        "operationId": "accept_consent_auth_consent_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentStatusOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/auth/consent-status": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Consent Status",
+        "operationId": "consent_status_auth_consent_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentStatusOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/auth/password-reset/request": {
       "post": {
         "tags": [
@@ -2243,7 +2295,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/FieldWorkerOut"
+                    "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
                   },
                   "type": "array",
                   "title": "Response List Field Workers Field Workers Get"
@@ -2280,7 +2332,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FieldWorkerOut"
+                  "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
                 }
               }
             }
@@ -2374,7 +2426,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FieldWorkerOut"
+                  "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
                 }
               }
             }
@@ -3877,6 +3929,32 @@
         }
       }
     },
+    "/me/personal-data": {
+      "get": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Get My Personal Data",
+        "operationId": "get_my_personal_data_me_personal_data_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalDataOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/monitoring/board": {
       "get": {
         "tags": [
@@ -5138,6 +5216,37 @@
         "title": "AssignmentOut",
         "description": "One row of a stop's append-only `stop_assignments` chain (spec §3.4, RF21). Shipped\nin `assignment_history` only when the stop was reassigned at least once; the manager\npanel (Task 8) renders it, the mobile app ignores the field."
       },
+      "AuthEventOut": {
+        "properties": {
+          "event": {
+            "type": "string",
+            "title": "Event"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event",
+          "ip_address",
+          "created_at"
+        ],
+        "title": "AuthEventOut"
+      },
       "BoardAlert": {
         "properties": {
           "id": {
@@ -5946,6 +6055,48 @@
         "title": "ComplianceTotalsOut",
         "description": "Mirror of `ComplianceTotals` — the same shape as a row without the period identity."
       },
+      "ConsentEntryOut": {
+        "properties": {
+          "notice_version": {
+            "type": "integer",
+            "title": "Notice Version"
+          },
+          "accepted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Accepted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_version",
+          "accepted_at"
+        ],
+        "title": "ConsentEntryOut"
+      },
+      "ConsentStatusOut": {
+        "properties": {
+          "consent_required": {
+            "type": "boolean",
+            "title": "Consent Required"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NoticeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent_required"
+        ],
+        "title": "ConsentStatusOut"
+      },
       "ContractorCompanyCreateRequest": {
         "properties": {
           "name": {
@@ -6215,6 +6366,24 @@
           "idempotency_key"
         ],
         "title": "EvidenceNoteRequest"
+      },
+      "EvidenceSummaryOut": {
+        "properties": {
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_bytes": {
+            "type": "integer",
+            "title": "Total Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_items",
+          "total_bytes"
+        ],
+        "title": "EvidenceSummaryOut"
       },
       "ExecutionAssignmentOut": {
         "properties": {
@@ -6777,53 +6946,6 @@
           "service_type_ids"
         ],
         "title": "FieldWorkerCreateRequest"
-      },
-      "FieldWorkerOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "contractor_company_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "full_name",
-          "contractor_company_id",
-          "service_type_ids",
-          "user_id"
-        ],
-        "title": "FieldWorkerOut"
       },
       "FieldWorkerUpdateRequest": {
         "properties": {
@@ -7479,6 +7601,29 @@
         ],
         "title": "MaterializeBody"
       },
+      "NoticeOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body_markdown": {
+            "type": "string",
+            "title": "Body Markdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "title",
+          "body_markdown"
+        ],
+        "title": "NoticeOut"
+      },
       "NotificationOut": {
         "properties": {
           "id": {
@@ -7532,6 +7677,24 @@
           "created_at"
         ],
         "title": "NotificationOut"
+      },
+      "NotificationsSummaryOut": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "unread"
+        ],
+        "title": "NotificationsSummaryOut"
       },
       "OccasionalRouteBody": {
         "properties": {
@@ -7671,6 +7834,61 @@
         ],
         "title": "PasswordResetRequest"
       },
+      "PersonalDataOut": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/ProfileOut"
+          },
+          "field_worker": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__api__me__FieldWorkerOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consent_history": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentEntryOut"
+            },
+            "type": "array",
+            "title": "Consent History"
+          },
+          "auth_events": {
+            "items": {
+              "$ref": "#/components/schemas/AuthEventOut"
+            },
+            "type": "array",
+            "title": "Auth Events"
+          },
+          "executions_summary": {
+            "$ref": "#/components/schemas/TimeSpanOut"
+          },
+          "evidence_summary": {
+            "$ref": "#/components/schemas/EvidenceSummaryOut"
+          },
+          "positions_summary": {
+            "$ref": "#/components/schemas/TimeSpanOut"
+          },
+          "notifications_summary": {
+            "$ref": "#/components/schemas/NotificationsSummaryOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile",
+          "field_worker",
+          "consent_history",
+          "auth_events",
+          "executions_summary",
+          "evidence_summary",
+          "positions_summary",
+          "notifications_summary"
+        ],
+        "title": "PersonalDataOut"
+      },
       "PointType": {
         "type": "string",
         "enum": [
@@ -7678,6 +7896,46 @@
           "OCCASIONAL"
         ],
         "title": "PointType"
+      },
+      "ProfileOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "is_active",
+          "created_at"
+        ],
+        "title": "ProfileOut"
       },
       "PublishedVersionResponse": {
         "properties": {
@@ -9018,6 +9276,45 @@
         "type": "object",
         "title": "TemplateUpdateBody"
       },
+      "TimeSpanOut": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "first_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First At"
+          },
+          "last_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "first_at",
+          "last_at"
+        ],
+        "title": "TimeSpanOut"
+      },
       "TokenResponse": {
         "properties": {
           "access_token": {
@@ -9032,12 +9329,17 @@
             "type": "string",
             "title": "Token Type",
             "default": "bearer"
+          },
+          "consent_required": {
+            "type": "boolean",
+            "title": "Consent Required"
           }
         },
         "type": "object",
         "required": [
           "access_token",
-          "refresh_token"
+          "refresh_token",
+          "consent_required"
         ],
         "title": "TokenResponse"
       },
@@ -9276,6 +9578,87 @@
           "accuracy_m"
         ],
         "title": "WorkerPositionOut"
+      },
+      "app__api__field_workers__FieldWorkerOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "contractor_company_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractor Company Id"
+          },
+          "service_type_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Service Type Ids"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "contractor_company_id",
+          "service_type_ids",
+          "user_id"
+        ],
+        "title": "FieldWorkerOut"
+      },
+      "app__api__me__FieldWorkerOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "contractor_company_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractor Company Id"
+          },
+          "service_type_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Service Type Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "contractor_company_id",
+          "service_type_ids"
+        ],
+        "title": "FieldWorkerOut"
       }
     },
     "securitySchemes": {
