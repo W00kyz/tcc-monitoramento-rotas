@@ -10,6 +10,7 @@ docs/ESTADO_DA_SESSAO.md
 .claude/
 .superpowers/
 docs/superpowers/
+docs/piloto/
 CLAUDE.local.md
 
 # Artefatos grandes de infraestrutura — gerados por script, nunca commitados
