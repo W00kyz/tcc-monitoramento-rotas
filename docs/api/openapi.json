@@ -2295,7 +2295,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
+                    "$ref": "#/components/schemas/FieldWorkerOut"
                   },
                   "type": "array",
                   "title": "Response List Field Workers Field Workers Get"
@@ -2332,7 +2332,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
+                  "$ref": "#/components/schemas/FieldWorkerOut"
                 }
               }
             }
@@ -2426,7 +2426,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__api__field_workers__FieldWorkerOut"
+                  "$ref": "#/components/schemas/FieldWorkerOut"
                 }
               }
             }
@@ -6947,6 +6947,53 @@
         ],
         "title": "FieldWorkerCreateRequest"
       },
+      "FieldWorkerOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "contractor_company_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractor Company Id"
+          },
+          "service_type_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Service Type Ids"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "contractor_company_id",
+          "service_type_ids",
+          "user_id"
+        ],
+        "title": "FieldWorkerOut"
+      },
       "FieldWorkerUpdateRequest": {
         "properties": {
           "full_name": {
@@ -7601,6 +7648,40 @@
         ],
         "title": "MaterializeBody"
       },
+      "MyFieldWorkerOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "contractor_company_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractor Company Id"
+          },
+          "service_type_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Service Type Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "contractor_company_id",
+          "service_type_ids"
+        ],
+        "title": "MyFieldWorkerOut"
+      },
       "NoticeOut": {
         "properties": {
           "version": {
@@ -7842,7 +7923,7 @@
           "field_worker": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/app__api__me__FieldWorkerOut"
+                "$ref": "#/components/schemas/MyFieldWorkerOut"
               },
               {
                 "type": "null"
@@ -9578,87 +9659,6 @@
           "accuracy_m"
         ],
         "title": "WorkerPositionOut"
-      },
-      "app__api__field_workers__FieldWorkerOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "contractor_company_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "full_name",
-          "contractor_company_id",
-          "service_type_ids",
-          "user_id"
-        ],
-        "title": "FieldWorkerOut"
-      },
-      "app__api__me__FieldWorkerOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "contractor_company_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "full_name",
-          "contractor_company_id",
-          "service_type_ids"
-        ],
-        "title": "FieldWorkerOut"
       }
     },
     "securitySchemes": {
