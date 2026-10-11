@@ -26,3 +26,9 @@ infra/data/
 
 # Scratch de sessão (agente) — nunca versionado
 /scratchpad/
+
+# Artefatos de design gerados por IA (design-for-ai) — nunca versionados
+.design-foundations/
+/DESIGN.md
+/JOURNEY.md
+/used-dna.json

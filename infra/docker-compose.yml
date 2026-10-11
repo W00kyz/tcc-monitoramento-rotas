@@ -66,10 +66,10 @@ services:
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
-      # Bind do código para o --reload do uvicorn funcionar; o .venv fica no
-      # volume anônimo para não ser sobrescrito pelo host.
+      # Bind só do código, para o --reload do uvicorn funcionar. O .venv vem da
+      # imagem: nada de volume para ele — um volume nomeado congelaria o .venv
+      # da primeira build e esconderia dependências novas do uv.lock.
       - ../backend/app:/app/app
-      - backend_venv:/app/.venv
     depends_on:
       postgres:
         condition: service_healthy
@@ -100,7 +100,8 @@ services:
     volumes:
       - ../dashboard/src:/app/src
       - ../dashboard/index.html:/app/index.html
-      - dashboard_modules:/app/node_modules
+      # node_modules vem da imagem (npm ci). Um volume nomeado aqui congelaria a
+      # primeira instalação e quebraria o Vite a cada dependência nova.
     depends_on:
       backend:
         condition: service_healthy
@@ -117,5 +118,3 @@ services:
 volumes:
   postgres_data:
   minio_data:
-  backend_venv:
-  dashboard_modules:
