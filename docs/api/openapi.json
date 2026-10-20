@@ -2574,6 +2574,152 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "Delete Building Endpoint",
+        "description": "Removes the building with its floors, QR codes, points and their history — decided by\nthe product owner (spec 2026-10-20-predios-pontos-dialogs-design.md §3.4).",
+        "operationId": "delete_building_endpoint_buildings__building_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "building_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Building Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/buildings/{building_id}/footprint": {
+      "put": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "Set Building Footprint",
+        "operationId": "set_building_footprint_buildings__building_id__footprint_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "building_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Building Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildingFootprintRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/buildings/{building_id}/deletion-impact": {
+      "get": {
+        "tags": [
+          "buildings"
+        ],
+        "summary": "Building Deletion Impact",
+        "operationId": "building_deletion_impact_buildings__building_id__deletion_impact_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "building_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Building Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionImpactOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/floors": {
@@ -2737,145 +2883,12 @@
         }
       }
     },
-    "/events": {
-      "get": {
-        "tags": [
-          "events"
-        ],
-        "summary": "List Events",
-        "operationId": "list_events_events_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EventOut"
-                  },
-                  "type": "array",
-                  "title": "Response List Events Events Get"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "events"
-        ],
-        "summary": "Create Event",
-        "operationId": "create_event_events_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EventCreateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/events/{event_id}": {
-      "patch": {
-        "tags": [
-          "events"
-        ],
-        "summary": "Update Event",
-        "operationId": "update_event_events__event_id__patch",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "event_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Event Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EventUpdateRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/service-points": {
       "get": {
         "tags": [
           "service-points"
         ],
         "summary": "List Service Points",
-        "description": "RF25 — an OCCASIONAL point past its event's valid_until is hidden here by default (no\narchived_at column: computed at query time, spec Ruling 1). include_archived=true is what\nthe historical-reports view (RF43, later etapa) will pass.",
         "operationId": "list_service_points_service_points_get",
         "security": [
           {
@@ -2901,13 +2914,20 @@
             }
           },
           {
-            "name": "include_archived",
+            "name": "building_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": false,
-              "title": "Include Archived"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
             }
           }
         ],
@@ -3039,15 +3059,55 @@
             }
           }
         }
-      }
-    },
-    "/service-points/{point_id}/promote": {
-      "post": {
+      },
+      "delete": {
         "tags": [
           "service-points"
         ],
-        "summary": "Promote Service Point",
-        "operationId": "promote_service_point_service_points__point_id__promote_post",
+        "summary": "Delete Service Point",
+        "description": "Removes the point and its history (route stops, executions, photos) — decided by the\nproduct owner (spec 2026-10-20-predios-pontos-dialogs-design.md §3.4).",
+        "operationId": "delete_service_point_service_points__point_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "point_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Point Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/service-points/{point_id}/deletion-impact": {
+      "get": {
+        "tags": [
+          "service-points"
+        ],
+        "summary": "Service Point Deletion Impact",
+        "operationId": "service_point_deletion_impact_service_points__point_id__deletion_impact_get",
         "security": [
           {
             "HTTPBearer": []
@@ -3071,7 +3131,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServicePointOut"
+                  "$ref": "#/components/schemas/DeletionImpactOut"
                 }
               }
             }
@@ -5152,13 +5212,25 @@
           },
           "value": {
             "title": "Value"
+          },
+          "question_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Type"
           }
         },
         "type": "object",
         "required": [
           "question_stable_key",
           "prompt",
-          "value"
+          "value",
+          "question_type"
         ],
         "title": "AnswerOut"
       },
@@ -5491,14 +5563,43 @@
           "campus_area": {
             "type": "string",
             "title": "Campus Area"
+          },
+          "footprint": {
+            "$ref": "#/components/schemas/PolygonFootprint"
           }
         },
         "type": "object",
         "required": [
           "name",
-          "campus_area"
+          "campus_area",
+          "footprint"
         ],
         "title": "BuildingCreateRequest"
+      },
+      "BuildingFootprintRequest": {
+        "properties": {
+          "footprint": {
+            "$ref": "#/components/schemas/PolygonFootprint"
+          },
+          "osm_way_id": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMaximum": 9.223372036854776e+18,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Osm Way Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "footprint"
+        ],
+        "title": "BuildingFootprintRequest"
       },
       "BuildingOut": {
         "properties": {
@@ -5514,6 +5615,40 @@
           "campus_area": {
             "type": "string",
             "title": "Campus Area"
+          },
+          "footprint": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Footprint"
+          },
+          "footprint_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Footprint Source"
+          },
+          "osm_way_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Osm Way Id"
           }
         },
         "type": "object",
@@ -6157,6 +6292,40 @@
         ],
         "title": "ContractorCompanyUpdateRequest"
       },
+      "DeletionImpactOut": {
+        "properties": {
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "floors": {
+            "type": "integer",
+            "title": "Floors"
+          },
+          "routes": {
+            "type": "integer",
+            "title": "Routes"
+          },
+          "executions": {
+            "type": "integer",
+            "title": "Executions"
+          },
+          "photos": {
+            "type": "integer",
+            "title": "Photos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "points",
+          "floors",
+          "routes",
+          "executions",
+          "photos"
+        ],
+        "title": "DeletionImpactOut",
+        "description": "What a removal takes with it — shown before the manager confirms."
+      },
       "EmbeddedForm": {
         "properties": {
           "form_version_id": {
@@ -6179,87 +6348,6 @@
         ],
         "title": "EmbeddedForm",
         "description": "The stop's active PUBLISHED execution form, shipped inside `GET /routes/me` so the app\nhas the schema (with hashes) before it goes offline (spec §5.2, Etapa 7)."
-      },
-      "EventCreateRequest": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "valid_from": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid From"
-          },
-          "valid_until": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid Until"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "valid_from",
-          "valid_until"
-        ],
-        "title": "EventCreateRequest"
-      },
-      "EventOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "valid_from": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid From"
-          },
-          "valid_until": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid Until"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "valid_from",
-          "valid_until"
-        ],
-        "title": "EventOut"
-      },
-      "EventUpdateRequest": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "valid_from": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid From"
-          },
-          "valid_until": {
-            "type": "string",
-            "format": "date",
-            "title": "Valid Until"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "valid_from",
-          "valid_until"
-        ],
-        "title": "EventUpdateRequest"
       },
       "EvidenceItemOut": {
         "properties": {
@@ -6325,6 +6413,18 @@
               }
             ],
             "title": "Content Url"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
           }
         },
         "type": "object",
@@ -6336,7 +6436,8 @@
           "content_type",
           "byte_size",
           "created_at",
-          "content_url"
+          "content_url",
+          "idempotency_key"
         ],
         "title": "EvidenceItemOut"
       },
@@ -6695,6 +6796,18 @@
               }
             ],
             "title": "Content Url"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
           }
         },
         "type": "object",
@@ -6706,7 +6819,8 @@
           "byte_size",
           "captured_at",
           "created_at",
-          "content_url"
+          "content_url",
+          "idempotency_key"
         ],
         "title": "ExecutionEvidence"
       },
@@ -7972,13 +8086,33 @@
         ],
         "title": "PersonalDataOut"
       },
-      "PointType": {
-        "type": "string",
-        "enum": [
-          "REGULAR",
-          "OCCASIONAL"
+      "PolygonFootprint": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Polygon",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Coordinates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
         ],
-        "title": "PointType"
+        "title": "PolygonFootprint"
       },
       "ProfileOut": {
         "properties": {
@@ -8129,7 +8263,8 @@
           "NUMBER",
           "BOOLEAN",
           "SINGLE_CHOICE",
-          "MULTI_CHOICE"
+          "MULTI_CHOICE",
+          "MEDIA"
         ],
         "title": "QuestionType"
       },
@@ -8421,10 +8556,6 @@
             "type": "number",
             "title": "Longitude"
           },
-          "point_type": {
-            "type": "string",
-            "title": "Point Type"
-          },
           "expected_arrival_from": {
             "anyOf": [
               {
@@ -8551,7 +8682,6 @@
           "building_name",
           "latitude",
           "longitude",
-          "point_type",
           "expected_arrival_from",
           "expected_arrival_to",
           "distance_from_prev_m",
@@ -8635,39 +8765,14 @@
           "description": {
             "type": "string",
             "title": "Description"
-          },
-          "latitude": {
-            "type": "number",
-            "title": "Latitude"
-          },
-          "longitude": {
-            "type": "number",
-            "title": "Longitude"
-          },
-          "point_type": {
-            "$ref": "#/components/schemas/PointType",
-            "default": "REGULAR"
-          },
-          "event_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Event Id"
           }
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
           "floor_id",
           "name",
-          "description",
-          "latitude",
-          "longitude"
+          "description"
         ],
         "title": "ServicePointCreateRequest"
       },
@@ -8698,21 +8803,6 @@
           "longitude": {
             "type": "number",
             "title": "Longitude"
-          },
-          "point_type": {
-            "$ref": "#/components/schemas/PointType"
-          },
-          "event_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Event Id"
           }
         },
         "type": "object",
@@ -8722,9 +8812,7 @@
           "name",
           "description",
           "latitude",
-          "longitude",
-          "point_type",
-          "event_id"
+          "longitude"
         ],
         "title": "ServicePointOut"
       },
@@ -8737,22 +8825,13 @@
           "description": {
             "type": "string",
             "title": "Description"
-          },
-          "latitude": {
-            "type": "number",
-            "title": "Latitude"
-          },
-          "longitude": {
-            "type": "number",
-            "title": "Longitude"
           }
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
           "name",
-          "description",
-          "latitude",
-          "longitude"
+          "description"
         ],
         "title": "ServicePointUpdateRequest"
       },
