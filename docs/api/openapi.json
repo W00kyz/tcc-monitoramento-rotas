@@ -67,6 +67,48 @@
         }
       }
     },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register",
+        "description": "Public sign-up of a field worker; a manager approves it before it can work.",
+        "operationId": "register_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/refresh": {
       "post": {
         "tags": [
@@ -252,51 +294,55 @@
         }
       }
     },
-    "/routes": {
-      "post": {
+    "/public/contractor-companies": {
+      "get": {
         "tags": [
-          "routes"
+          "public"
         ],
-        "summary": "Create Route Endpoint",
-        "operationId": "create_route_endpoint_routes_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RouteCreateBody"
-              }
-            }
-          }
-        },
+        "summary": "List Public Companies",
+        "description": "The companies a worker can choose from when signing up; name only, never the CNPJ.",
+        "operationId": "list_public_companies_public_contractor_companies_get",
         "responses": {
-          "201": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCompanyOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Public Companies Public Contractor Companies Get"
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/public/privacy-notice": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get Public Privacy Notice",
+        "description": "The notice a worker accepts when signing up; its version goes back in the sign-up.",
+        "operationId": "get_public_privacy_notice_public_privacy_notice_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoticeOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/routes": {
       "get": {
         "tags": [
           "routes"
@@ -344,22 +390,6 @@
             }
           },
           {
-            "name": "route_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Route Type"
-            }
-          },
-          {
             "name": "status",
             "in": "query",
             "required": false,
@@ -404,35 +434,58 @@
         }
       }
     },
-    "/routes/occasional": {
+    "/routes/me": {
+      "get": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "My Day",
+        "description": "RF27 \"rota do dia\": the signed-in worker's route of today (or none yet). Same `RouteOut`\nshape the manager endpoints return, so mobile and the dashboard render a route identically.",
+        "operationId": "my_day_routes_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyDayOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/routes/start": {
       "post": {
         "tags": [
           "routes"
         ],
-        "summary": "Create Occasional Routes",
-        "description": "RF23 / spec §3.5 Ruling 2 — an occasional route assigned to N workers is N independent\nroutes, one per worker, each a copy of the same stops. One transaction: if any worker id\nis unknown, nothing is committed.",
-        "operationId": "create_occasional_routes_routes_occasional_post",
+        "summary": "Start Route",
+        "description": "The \"Iniciar rota\" button: create or reopen today's route and hand out a batch; a retry\nwhile the batch is open returns it unchanged. A route DONE for an empty pool is looked at\nagain: reopened with the points released since, else `pool_empty=true`. 409 with a machine\ncode when the day or the position refuses any batch.",
+        "operationId": "start_route_routes_start_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OccasionalRouteBody"
+                "$ref": "#/components/schemas/AllocationBody"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RouteOut"
-                  },
-                  "type": "array",
-                  "title": "Response Create Occasional Routes Routes Occasional Post"
+                  "$ref": "#/components/schemas/AllocationOut"
                 }
               }
             }
@@ -455,14 +508,14 @@
         ]
       }
     },
-    "/routes/me": {
-      "get": {
+    "/routes/{route_id}/next-batch": {
+      "post": {
         "tags": [
           "routes"
         ],
-        "summary": "List My Routes",
-        "description": "RF27 \"rota do dia\": the mobile feed for the signed-in worker. Same `RouteOut` shape the\nmanager endpoints return, so mobile and the dashboard render a route identically. Without\n`?date=` it defaults to today; CANCELLED routes are never shown.",
-        "operationId": "list_my_routes_routes_me_get",
+        "summary": "Next Route Batch",
+        "description": "The next batch once the current one has no open stop (unchanged while it has one). An\nempty pool closes the route: `pool_empty=true`, status DONE; asking again the same workday\nreopens it when a point went back to the pool. 409 `ROUTE_DONE` for a route of a past\nday.",
+        "operationId": "next_route_batch_routes__route_id__next_batch_post",
         "security": [
           {
             "HTTPBearer": []
@@ -470,34 +523,33 @@
         ],
         "parameters": [
           {
-            "name": "date",
-            "in": "query",
-            "required": false,
+            "name": "route_id",
+            "in": "path",
+            "required": true,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Date"
+              "type": "string",
+              "format": "uuid",
+              "title": "Route Id"
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AllocationBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RouteOut"
-                  },
-                  "title": "Response List My Routes Routes Me Get"
+                  "$ref": "#/components/schemas/AllocationOut"
                 }
               }
             }
@@ -541,589 +593,6 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Patch Route",
-        "operationId": "patch_route_routes__route_id__patch",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RouteUpdateBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/routes/{route_id}/optimize": {
-      "post": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Optimize Route Endpoint",
-        "operationId": "optimize_route_endpoint_routes__route_id__optimize_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/routes/{route_id}/reassign": {
-      "post": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Reassign Route Endpoint",
-        "operationId": "reassign_route_endpoint_routes__route_id__reassign_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReassignBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/routes/{route_id}/cancel": {
-      "post": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Cancel Route Endpoint",
-        "operationId": "cancel_route_endpoint_routes__route_id__cancel_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/routes/{route_id}/start": {
-      "post": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Start Route Endpoint",
-        "operationId": "start_route_endpoint_routes__route_id__start_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StartRouteRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/routes/{route_id}/stops/{stop_id}/complete-manually": {
-      "post": {
-        "tags": [
-          "routes"
-        ],
-        "summary": "Complete Stop Manually",
-        "description": "RF53 — a manager closes a stop the worker could not reach, with a reason and no\nevidence. `complete_manually` owns and commits its own transaction (the execution module\nexception to \"service flushes, never commits\"); the audit trail is appended in a second\ntransaction afterwards, exactly as `start_route` does.",
-        "operationId": "complete_stop_manually_routes__route_id__stops__stop_id__complete_manually_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "route_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Route Id"
-            }
-          },
-          {
-            "name": "stop_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Stop Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompleteManuallyBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RouteOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/route-templates": {
-      "get": {
-        "tags": [
-          "route-templates"
-        ],
-        "summary": "List Route Templates",
-        "operationId": "list_route_templates_route_templates_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/TemplateOut"
-                  },
-                  "type": "array",
-                  "title": "Response List Route Templates Route Templates Get"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "route-templates"
-        ],
-        "summary": "Create Route Template",
-        "operationId": "create_route_template_route_templates_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TemplateCreateBody"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TemplateOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/route-templates/{template_id}": {
-      "get": {
-        "tags": [
-          "route-templates"
-        ],
-        "summary": "Get Route Template",
-        "operationId": "get_route_template_route_templates__template_id__get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "template_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Template Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TemplateOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "route-templates"
-        ],
-        "summary": "Update Route Template",
-        "operationId": "update_route_template_route_templates__template_id__patch",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "template_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Template Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TemplateUpdateBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TemplateOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/route-templates/{template_id}/materialize": {
-      "post": {
-        "tags": [
-          "route-templates"
-        ],
-        "summary": "Materialize Route Template",
-        "operationId": "materialize_route_template_route_templates__template_id__materialize_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "template_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Template Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MaterializeBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -2023,81 +1492,8 @@
           "service-types"
         ],
         "summary": "List Service Types",
+        "description": "Every type, or with `?unassigned=true` only those no company has adopted yet.",
         "operationId": "list_service_types_service_types_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceTypeOut"
-                  },
-                  "type": "array",
-                  "title": "Response List Service Types Service Types Get"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "service-types"
-        ],
-        "summary": "Create Service Type",
-        "operationId": "create_service_type_service_types_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceTypeCreateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceTypeOut"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/service-types/{service_type_id}": {
-      "patch": {
-        "tags": [
-          "service-types"
-        ],
-        "summary": "Update Service Type",
-        "operationId": "update_service_type_service_types__service_type_id__patch",
         "security": [
           {
             "HTTPBearer": []
@@ -2105,33 +1501,27 @@
         ],
         "parameters": [
           {
-            "name": "service_type_id",
-            "in": "path",
-            "required": true,
+            "name": "unassigned",
+            "in": "query",
+            "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Service Type Id"
+              "type": "boolean",
+              "default": false,
+              "title": "Unassigned"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceTypeUpdateRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceTypeOut"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTypeOut"
+                  },
+                  "title": "Response List Service Types Service Types Get"
                 }
               }
             }
@@ -2309,25 +1699,34 @@
             "HTTPBearer": []
           }
         ]
-      },
+      }
+    },
+    "/field-workers/{worker_id}/approve": {
       "post": {
         "tags": [
           "field-workers"
         ],
-        "summary": "Create Field Worker",
-        "operationId": "create_field_worker_field_workers_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldWorkerCreateRequest"
-              }
+        "summary": "Approve Field Worker",
+        "operationId": "approve_field_worker_field_workers__worker_id__approve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "worker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Worker Id"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
-          "201": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -2347,52 +1746,16 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
-    "/field-workers/linkable-users": {
-      "get": {
+    "/field-workers/{worker_id}/reject": {
+      "post": {
         "tags": [
           "field-workers"
         ],
-        "summary": "List Linkable Users",
-        "description": "Finding C2: the dashboard's /profissionais screen needs FIELD_WORKER-role Users not yet\nlinked to a FieldWorker, for its link dropdown. GET /users is Admin-only (RF05), so a\nManager gets 403 there — this router serves its own minimal projection instead. Registered\nbefore any `/{worker_id}`-shaped route so \"linkable-users\" is never captured as a path\nparameter (this router currently has no GET \"/{worker_id}\", so no collision exists today\neither way, but the ordering is kept safe against one being added later).",
-        "operationId": "list_linkable_users_field_workers_linkable_users_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/LinkableUserOut"
-                  },
-                  "type": "array",
-                  "title": "Response List Linkable Users Field Workers Linkable Users Get"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/field-workers/{worker_id}": {
-      "patch": {
-        "tags": [
-          "field-workers"
-        ],
-        "summary": "Update Field Worker",
-        "operationId": "update_field_worker_field_workers__worker_id__patch",
+        "summary": "Reject Field Worker",
+        "operationId": "reject_field_worker_field_workers__worker_id__reject_post",
         "security": [
           {
             "HTTPBearer": []
@@ -2415,11 +1778,107 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldWorkerUpdateRequest"
+                "$ref": "#/components/schemas/RejectRequest"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldWorkerOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/field-workers/{worker_id}/deactivate": {
+      "post": {
+        "tags": [
+          "field-workers"
+        ],
+        "summary": "Deactivate Field Worker",
+        "operationId": "deactivate_field_worker_field_workers__worker_id__deactivate_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "worker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Worker Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldWorkerOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/field-workers/{worker_id}/reactivate": {
+      "post": {
+        "tags": [
+          "field-workers"
+        ],
+        "summary": "Reactivate Field Worker",
+        "operationId": "reactivate_field_worker_field_workers__worker_id__reactivate_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "worker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Worker Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3723,7 +3182,7 @@
           "impediments"
         ],
         "summary": "Report Impediment",
-        "description": "RF16-RF17 — the field worker signals they cannot execute this stop (scope=STOP) or the\nrest of the route (scope=ROUTE_REMAINDER). The report is the record; no audit-trail entry\nis appended here (nothing on the assignment chain moved yet).",
+        "description": "RF16-RF17 — the field worker signals they cannot execute this stop (scope=STOP) or the\nrest of the route (scope=ROUTE_REMAINDER); what it covers goes back to the pool and the\nmanagers are alerted and notified. The report, and the released stops' `release_reason`,\nare the record — no audit-trail entry is appended here.",
         "operationId": "report_impediment_routes__route_id__impediments_post",
         "security": [
           {
@@ -3782,7 +3241,7 @@
           "impediments"
         ],
         "summary": "List Impediments",
-        "description": "The manager's queue. Only the PENDING queue is served — the impediment domain keeps no\nother list — so any other `?status=` value is a client error, not an empty list.",
+        "description": "The manager's Justificativas tab (spec §8.4): every impediment, PENDING first, or only\nthose of `?status=`.",
         "operationId": "list_impediments_impediments_get",
         "security": [
           {
@@ -3795,8 +3254,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "default": "PENDING",
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ImpedimentStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Status"
             }
           }
@@ -3829,13 +3294,14 @@
         }
       }
     },
-    "/impediments/{impediment_id}/candidates": {
-      "get": {
+    "/impediments/{impediment_id}/acknowledge": {
+      "post": {
         "tags": [
           "impediments"
         ],
-        "summary": "List Candidates",
-        "operationId": "list_candidates_impediments__impediment_id__candidates_get",
+        "summary": "Acknowledge",
+        "description": "The manager's \"ciente\": PENDING → RESOLVED, audited. Idempotent on a RESOLVED one.",
+        "operationId": "acknowledge_impediments__impediment_id__acknowledge_post",
         "security": [
           {
             "HTTPBearer": []
@@ -3850,6 +3316,137 @@
               "type": "string",
               "format": "uuid",
               "title": "Impediment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpedimentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appeals/eligible": {
+      "get": {
+        "tags": [
+          "appeals"
+        ],
+        "summary": "List Appealable Stops",
+        "description": "The app's \"Pontos liberados que você pode contestar\": the worker's released stops they\nmay still appeal, latest release first.",
+        "operationId": "list_appealable_stops_appeals_eligible_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppealableStopOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Appealable Stops Appeals Eligible Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/appeals": {
+      "post": {
+        "tags": [
+          "appeals"
+        ],
+        "summary": "Create Appeal",
+        "description": "The worker declares they executed a released stop (spec §7.5). Idempotent on\n`idempotency_key`; 409 `NOT_APPEALABLE` with a `reason_code` when it is not theirs to\nappeal now.",
+        "operationId": "create_appeal_appeals_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppealOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "appeals"
+        ],
+        "summary": "List Appeals",
+        "description": "The manager's Justificativas \"Recursos\" tab (spec §8.4): every appeal, PENDING first, or\nonly those of `?status=`.",
+        "operationId": "list_appeals_appeals_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AppealStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
             }
           }
         ],
@@ -3861,9 +3458,9 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ReassignCandidateOut"
+                    "$ref": "#/components/schemas/AppealOut"
                   },
-                  "title": "Response List Candidates Impediments  Impediment Id  Candidates Get"
+                  "title": "Response List Appeals Appeals Get"
                 }
               }
             }
@@ -3881,14 +3478,45 @@
         }
       }
     },
-    "/impediments/{impediment_id}/reassign": {
+    "/appeals/mine": {
+      "get": {
+        "tags": [
+          "appeals"
+        ],
+        "summary": "List My Appeals",
+        "description": "The worker's own appeals and their decisions, pending first.",
+        "operationId": "list_my_appeals_appeals_mine_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppealOut"
+                  },
+                  "type": "array",
+                  "title": "Response List My Appeals Appeals Mine Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/appeals/{appeal_id}/accept": {
       "post": {
         "tags": [
-          "impediments"
+          "appeals"
         ],
-        "summary": "Reassign",
-        "description": "RF18-RF21 — move the impediment's affected stop(s) onto `field_worker_id`'s route for\nthe same date and mark the impediment RESOLVED. `reassign_impediment` delegates the move\nto `reassign_stops`, which appends its own stop-assignment rows; this endpoint adds one\naudit-trail entry naming the manager's decision.",
-        "operationId": "reassign_impediments__impediment_id__reassign_post",
+        "summary": "Accept",
+        "description": "Accept: the stop gets an `APPEAL` execution by the worker. 409 `ALREADY_REVIEWED` once\ndecided.",
+        "operationId": "accept_appeals__appeal_id__accept_post",
         "security": [
           {
             "HTTPBearer": []
@@ -3896,13 +3524,13 @@
         ],
         "parameters": [
           {
-            "name": "impediment_id",
+            "name": "appeal_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Impediment Id"
+              "title": "Appeal Id"
             }
           }
         ],
@@ -3911,7 +3539,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ImpedimentReassignBody"
+                "$ref": "#/components/schemas/AppealReviewBody"
               }
             }
           }
@@ -3922,7 +3550,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImpedimentOut"
+                  "$ref": "#/components/schemas/AppealOut"
                 }
               }
             }
@@ -3940,14 +3568,14 @@
         }
       }
     },
-    "/impediments/{impediment_id}/dismiss": {
+    "/appeals/{appeal_id}/reject": {
       "post": {
         "tags": [
-          "impediments"
+          "appeals"
         ],
-        "summary": "Dismiss",
-        "description": "Close the impediment with no reassignment (RF17) — a duplicate report, or one the\nmanager resolved off-system.",
-        "operationId": "dismiss_impediments__impediment_id__dismiss_post",
+        "summary": "Reject",
+        "description": "Reject: nothing changes besides the record. 409 `ALREADY_REVIEWED` once decided.",
+        "operationId": "reject_appeals__appeal_id__reject_post",
         "security": [
           {
             "HTTPBearer": []
@@ -3955,23 +3583,33 @@
         ],
         "parameters": [
           {
-            "name": "impediment_id",
+            "name": "appeal_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Impediment Id"
+              "title": "Appeal Id"
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealReviewBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ImpedimentOut"
+                  "$ref": "#/components/schemas/AppealOut"
                 }
               }
             }
@@ -4021,7 +3659,7 @@
           "monitoring"
         ],
         "summary": "Get Board",
-        "description": "RF41 — the coloured route board: every open route with its derived `is_delayed` flag and\nOPEN alert count, the board's alert list, and the latest GPS fix per worker.",
+        "description": "RF41 — the board of the day: per-type pool KPIs, today's routes with their current\nbatch and OPEN alert count, who has not started, today's releases, the board's alert list,\nand the latest GPS fix per worker.",
         "operationId": "get_board_monitoring_board_get",
         "responses": {
           "200": {
@@ -4550,7 +4188,7 @@
           "reports"
         ],
         "summary": "Get Compliance Report",
-        "description": "RF45 — the route-compliance read model as JSON: the granularity buckets with the 13\nindicators plus `completion_rate`, a totals row, and the resolved `filters_applied`.",
+        "description": "RF45 — the compliance read model as JSON: the granularity buckets with the point-day\nindicators plus `completion_rate`, a totals row, and the resolved `filters_applied`.",
         "operationId": "get_compliance_report_reports_compliance_get",
         "security": [
           {
@@ -4604,6 +4242,23 @@
             }
           },
           {
+            "name": "company_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
             "name": "service_type_id",
             "in": "query",
             "required": false,
@@ -4638,19 +4293,24 @@
             }
           },
           {
-            "name": "route_status",
+            "name": "outcome",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
+                  "enum": [
+                    "DONE",
+                    "DONE_BY_APPEAL",
+                    "UNSERVED"
+                  ],
                   "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Route Status"
+              "title": "Outcome"
             }
           }
         ],
@@ -4738,6 +4398,23 @@
             }
           },
           {
+            "name": "company_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
             "name": "service_type_id",
             "in": "query",
             "required": false,
@@ -4772,19 +4449,24 @@
             }
           },
           {
-            "name": "route_status",
+            "name": "outcome",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
+                  "enum": [
+                    "DONE",
+                    "DONE_BY_APPEAL",
+                    "UNSERVED"
+                  ],
                   "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Route Status"
+              "title": "Outcome"
             }
           }
         ],
@@ -4870,6 +4552,23 @@
             }
           },
           {
+            "name": "company_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
             "name": "service_type_id",
             "in": "query",
             "required": false,
@@ -4904,19 +4603,24 @@
             }
           },
           {
-            "name": "route_status",
+            "name": "outcome",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
+                  "enum": [
+                    "DONE",
+                    "DONE_BY_APPEAL",
+                    "UNSERVED"
+                  ],
                   "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Route Status"
+              "title": "Outcome"
             }
           }
         ],
@@ -4947,6 +4651,38 @@
     "schemas": {
       "AccessTokenResponse": {
         "properties": {
+          "worker_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FieldWorkerStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "worker_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Active"
+          },
           "access_token": {
             "type": "string",
             "title": "Access Token"
@@ -4955,21 +4691,27 @@
             "type": "string",
             "title": "Token Type",
             "default": "bearer"
+          },
+          "consent_required": {
+            "type": "boolean",
+            "title": "Consent Required"
           }
         },
         "type": "object",
         "required": [
-          "access_token"
+          "access_token",
+          "consent_required"
         ],
         "title": "AccessTokenResponse"
       },
       "AlertKind": {
         "type": "string",
         "enum": [
-          "LATE_START",
-          "WORKER_ABSENT",
-          "LATE_STOP",
-          "NO_EVIDENCE"
+          "NO_EVIDENCE",
+          "POINT_IMPEDED",
+          "BATCH_RELEASED",
+          "POINTS_UNSERVED",
+          "APPEAL_FILED"
         ],
         "title": "AlertKind"
       },
@@ -4992,8 +4734,15 @@
             "title": "Description"
           },
           "route_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Route Id"
           },
           "route_stop_id": {
@@ -5176,6 +4925,48 @@
         ],
         "title": "AlertStatus"
       },
+      "AllocationBody": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "captured_at"
+        ],
+        "title": "AllocationBody",
+        "description": "Where the worker is when asking for a batch: the nearest free points are measured from\nhere, and it must be inside the campus."
+      },
+      "AllocationOut": {
+        "properties": {
+          "route": {
+            "$ref": "#/components/schemas/RouteOut"
+          },
+          "pool_empty": {
+            "type": "boolean",
+            "title": "Pool Empty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route",
+          "pool_empty"
+        ],
+        "title": "AllocationOut"
+      },
       "AnswerInBody": {
         "properties": {
           "stable_key": {
@@ -5234,26 +5025,100 @@
         ],
         "title": "AnswerOut"
       },
-      "AssignmentOut": {
+      "AppealBody": {
         "properties": {
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/AppealReason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "claimed_executed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claimed Executed At"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Idempotency Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_stop_id",
+          "reason",
+          "idempotency_key"
+        ],
+        "title": "AppealBody"
+      },
+      "AppealOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
           "field_worker_id": {
             "type": "string",
             "format": "uuid",
             "title": "Field Worker Id"
           },
-          "full_name": {
+          "field_worker_name": {
             "type": "string",
-            "title": "Full Name"
+            "title": "Field Worker Name"
           },
-          "sequence": {
-            "type": "integer",
-            "title": "Sequence"
-          },
-          "assigned_by_name": {
+          "service_point_id": {
             "type": "string",
-            "title": "Assigned By Name"
+            "format": "uuid",
+            "title": "Service Point Id"
           },
-          "transfer_reason": {
+          "service_point_name": {
+            "type": "string",
+            "title": "Service Point Name"
+          },
+          "building_name": {
+            "type": "string",
+            "title": "Building Name"
+          },
+          "released_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Released At"
+          },
+          "release_reason": {
+            "$ref": "#/components/schemas/ReleaseReason"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/AppealReason"
+          },
+          "note": {
             "anyOf": [
               {
                 "type": "string"
@@ -5262,9 +5127,41 @@
                 "type": "null"
               }
             ],
-            "title": "Transfer Reason"
+            "title": "Note"
           },
-          "outcome": {
+          "claimed_executed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claimed Executed At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AppealStatus"
+          },
+          "filed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Filed At"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewed_by_name": {
             "anyOf": [
               {
                 "type": "string"
@@ -5273,20 +5170,129 @@
                 "type": "null"
               }
             ],
-            "title": "Outcome"
+            "title": "Reviewed By Name"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
           }
         },
         "type": "object",
         "required": [
+          "id",
+          "route_stop_id",
           "field_worker_id",
-          "full_name",
-          "sequence",
-          "assigned_by_name",
-          "transfer_reason",
-          "outcome"
+          "field_worker_name",
+          "service_point_id",
+          "service_point_name",
+          "building_name",
+          "released_at",
+          "release_reason",
+          "reason",
+          "note",
+          "claimed_executed_at",
+          "status",
+          "filed_at",
+          "reviewed_at",
+          "reviewed_by_name",
+          "review_note"
         ],
-        "title": "AssignmentOut",
-        "description": "One row of a stop's append-only `stop_assignments` chain (spec §3.4, RF21). Shipped\nin `assignment_history` only when the stop was reassigned at least once; the manager\npanel (Task 8) renders it, the mobile app ignores the field."
+        "title": "AppealOut"
+      },
+      "AppealReason": {
+        "type": "string",
+        "enum": [
+          "NO_SIGNAL",
+          "LEFT_BRIEFLY",
+          "APP_CLOSED",
+          "OTHER"
+        ],
+        "title": "AppealReason"
+      },
+      "AppealReviewBody": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "AppealReviewBody"
+      },
+      "AppealStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "ACCEPTED",
+          "REJECTED"
+        ],
+        "title": "AppealStatus"
+      },
+      "AppealableStopOut": {
+        "properties": {
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "service_point_name": {
+            "type": "string",
+            "title": "Service Point Name"
+          },
+          "building_name": {
+            "type": "string",
+            "title": "Building Name"
+          },
+          "floor_label": {
+            "type": "string",
+            "title": "Floor Label"
+          },
+          "released_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Released At"
+          },
+          "release_reason": {
+            "$ref": "#/components/schemas/ReleaseReason"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Deadline"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_stop_id",
+          "service_point_id",
+          "service_point_name",
+          "building_name",
+          "floor_label",
+          "released_at",
+          "release_reason",
+          "deadline"
+        ],
+        "title": "AppealableStopOut"
       },
       "AuthEventOut": {
         "properties": {
@@ -5338,8 +5344,15 @@
             "title": "Description"
           },
           "route_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Route Id"
           },
           "route_stop_id": {
@@ -5445,6 +5458,10 @@
             "type": "string",
             "title": "Field Worker Name"
           },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
           "route_date": {
             "type": "string",
             "format": "date",
@@ -5454,21 +5471,24 @@
             "type": "string",
             "title": "Status"
           },
-          "is_delayed": {
-            "type": "boolean",
-            "title": "Is Delayed"
-          },
           "open_alert_count": {
             "type": "integer",
             "title": "Open Alert Count"
           },
-          "stop_total": {
+          "current_batch": {
             "type": "integer",
-            "title": "Stop Total"
+            "title": "Current Batch"
           },
-          "stop_done": {
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/BoardStop"
+            },
+            "type": "array",
+            "title": "Stops"
+          },
+          "done_today": {
             "type": "integer",
-            "title": "Stop Done"
+            "title": "Done Today"
           }
         },
         "type": "object",
@@ -5476,12 +5496,13 @@
           "route_id",
           "field_worker_id",
           "field_worker_name",
+          "company_name",
           "route_date",
           "status",
-          "is_delayed",
           "open_alert_count",
-          "stop_total",
-          "stop_done"
+          "current_batch",
+          "stops",
+          "done_today"
         ],
         "title": "BoardRoute"
       },
@@ -5492,12 +5513,34 @@
             "format": "date-time",
             "title": "Generated At"
           },
+          "service_day": {
+            "type": "boolean",
+            "title": "Service Day"
+          },
           "routes": {
             "items": {
               "$ref": "#/components/schemas/BoardRoute"
             },
             "type": "array",
             "title": "Routes"
+          },
+          "pool": {
+            "items": {
+              "$ref": "#/components/schemas/PoolKpi"
+            },
+            "type": "array",
+            "title": "Pool"
+          },
+          "not_started": {
+            "items": {
+              "$ref": "#/components/schemas/WorkerRef"
+            },
+            "type": "array",
+            "title": "Not Started"
+          },
+          "released_today": {
+            "type": "integer",
+            "title": "Released Today"
           },
           "open_alerts": {
             "items": {
@@ -5517,11 +5560,44 @@
         "type": "object",
         "required": [
           "generated_at",
+          "service_day",
           "routes",
+          "pool",
+          "not_started",
+          "released_today",
           "open_alerts",
           "worker_positions"
         ],
         "title": "BoardSnapshot"
+      },
+      "BoardStop": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "service_point_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Point Id"
+          },
+          "service_point_name": {
+            "type": "string",
+            "title": "Service Point Name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RouteStopStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "service_point_id",
+          "service_point_name",
+          "status"
+        ],
+        "title": "BoardStop"
       },
       "Body_upload_photo_executions__execution_id__evidence_photo_post": {
         "properties": {
@@ -5676,21 +5752,6 @@
           "campus_area"
         ],
         "title": "BuildingUpdateRequest"
-      },
-      "CancelBody": {
-        "properties": {
-          "reason": {
-            "type": "string",
-            "maxLength": 300,
-            "minLength": 1,
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "reason"
-        ],
-        "title": "CancelBody"
       },
       "CheckInRequest": {
         "properties": {
@@ -5959,20 +6020,29 @@
         ],
         "title": "CheckOutResponse"
       },
-      "CompleteManuallyBody": {
+      "CompanyServiceTypeOut": {
         "properties": {
-          "reason": {
+          "id": {
             "type": "string",
-            "maxLength": 500,
-            "minLength": 1,
-            "title": "Reason"
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "average_duration_minutes": {
+            "type": "integer",
+            "title": "Average Duration Minutes"
           }
         },
         "type": "object",
         "required": [
-          "reason"
+          "id",
+          "name",
+          "average_duration_minutes"
         ],
-        "title": "CompleteManuallyBody"
+        "title": "CompanyServiceTypeOut"
       },
       "ComplianceReportOut": {
         "properties": {
@@ -6023,6 +6093,66 @@
       },
       "ComplianceRowOut": {
         "properties": {
+          "points_total": {
+            "type": "integer",
+            "title": "Points Total"
+          },
+          "points_done": {
+            "type": "integer",
+            "title": "Points Done"
+          },
+          "points_done_by_appeal": {
+            "type": "integer",
+            "title": "Points Done By Appeal"
+          },
+          "points_unserved": {
+            "type": "integer",
+            "title": "Points Unserved"
+          },
+          "points_released": {
+            "type": "integer",
+            "title": "Points Released"
+          },
+          "points_impeded": {
+            "type": "integer",
+            "title": "Points Impeded"
+          },
+          "released_route_remainder": {
+            "type": "integer",
+            "title": "Released Route Remainder"
+          },
+          "released_left_campus": {
+            "type": "integer",
+            "title": "Released Left Campus"
+          },
+          "released_location_silence": {
+            "type": "integer",
+            "title": "Released Location Silence"
+          },
+          "released_end_of_day": {
+            "type": "integer",
+            "title": "Released End Of Day"
+          },
+          "executions_total": {
+            "type": "integer",
+            "title": "Executions Total"
+          },
+          "executions_with_evidence": {
+            "type": "integer",
+            "title": "Executions With Evidence"
+          },
+          "executions_flagged": {
+            "type": "integer",
+            "title": "Executions Flagged"
+          },
+          "alerts_total": {
+            "type": "integer",
+            "title": "Alerts Total"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate"
+          },
           "period_label": {
             "type": "string",
             "title": "Period Label"
@@ -6031,119 +6161,72 @@
             "type": "string",
             "format": "date",
             "title": "Period Start"
-          },
-          "routes_total": {
-            "type": "integer",
-            "title": "Routes Total"
-          },
-          "routes_started": {
-            "type": "integer",
-            "title": "Routes Started"
-          },
-          "routes_completed": {
-            "type": "integer",
-            "title": "Routes Completed"
-          },
-          "routes_cancelled": {
-            "type": "integer",
-            "title": "Routes Cancelled"
-          },
-          "stops_total": {
-            "type": "integer",
-            "title": "Stops Total"
-          },
-          "stops_done": {
-            "type": "integer",
-            "title": "Stops Done"
-          },
-          "stops_pending": {
-            "type": "integer",
-            "title": "Stops Pending"
-          },
-          "stops_reassigned": {
-            "type": "integer",
-            "title": "Stops Reassigned"
-          },
-          "executions_total": {
-            "type": "integer",
-            "title": "Executions Total"
-          },
-          "executions_with_evidence": {
-            "type": "integer",
-            "title": "Executions With Evidence"
-          },
-          "executions_flagged": {
-            "type": "integer",
-            "title": "Executions Flagged"
-          },
-          "impediments_total": {
-            "type": "integer",
-            "title": "Impediments Total"
-          },
-          "alerts_total": {
-            "type": "integer",
-            "title": "Alerts Total"
-          },
-          "completion_rate": {
-            "type": "number",
-            "title": "Completion Rate"
           }
         },
         "type": "object",
         "required": [
-          "period_label",
-          "period_start",
-          "routes_total",
-          "routes_started",
-          "routes_completed",
-          "routes_cancelled",
-          "stops_total",
-          "stops_done",
-          "stops_pending",
-          "stops_reassigned",
+          "points_total",
+          "points_done",
+          "points_done_by_appeal",
+          "points_unserved",
+          "points_released",
+          "points_impeded",
+          "released_route_remainder",
+          "released_left_campus",
+          "released_location_silence",
+          "released_end_of_day",
           "executions_total",
           "executions_with_evidence",
           "executions_flagged",
-          "impediments_total",
           "alerts_total",
-          "completion_rate"
+          "completion_rate",
+          "period_label",
+          "period_start"
         ],
         "title": "ComplianceRowOut",
-        "description": "Mirror of `ComplianceRow` — one granularity bucket with the 13 absolute indicators plus\nthe derived `completion_rate`."
+        "description": "Mirror of `ComplianceRow` — one granularity bucket: its identity plus the indicators."
       },
       "ComplianceTotalsOut": {
         "properties": {
-          "routes_total": {
+          "points_total": {
             "type": "integer",
-            "title": "Routes Total"
+            "title": "Points Total"
           },
-          "routes_started": {
+          "points_done": {
             "type": "integer",
-            "title": "Routes Started"
+            "title": "Points Done"
           },
-          "routes_completed": {
+          "points_done_by_appeal": {
             "type": "integer",
-            "title": "Routes Completed"
+            "title": "Points Done By Appeal"
           },
-          "routes_cancelled": {
+          "points_unserved": {
             "type": "integer",
-            "title": "Routes Cancelled"
+            "title": "Points Unserved"
           },
-          "stops_total": {
+          "points_released": {
             "type": "integer",
-            "title": "Stops Total"
+            "title": "Points Released"
           },
-          "stops_done": {
+          "points_impeded": {
             "type": "integer",
-            "title": "Stops Done"
+            "title": "Points Impeded"
           },
-          "stops_pending": {
+          "released_route_remainder": {
             "type": "integer",
-            "title": "Stops Pending"
+            "title": "Released Route Remainder"
           },
-          "stops_reassigned": {
+          "released_left_campus": {
             "type": "integer",
-            "title": "Stops Reassigned"
+            "title": "Released Left Campus"
+          },
+          "released_location_silence": {
+            "type": "integer",
+            "title": "Released Location Silence"
+          },
+          "released_end_of_day": {
+            "type": "integer",
+            "title": "Released End Of Day"
           },
           "executions_total": {
             "type": "integer",
@@ -6157,10 +6240,6 @@
             "type": "integer",
             "title": "Executions Flagged"
           },
-          "impediments_total": {
-            "type": "integer",
-            "title": "Impediments Total"
-          },
           "alerts_total": {
             "type": "integer",
             "title": "Alerts Total"
@@ -6172,23 +6251,24 @@
         },
         "type": "object",
         "required": [
-          "routes_total",
-          "routes_started",
-          "routes_completed",
-          "routes_cancelled",
-          "stops_total",
-          "stops_done",
-          "stops_pending",
-          "stops_reassigned",
+          "points_total",
+          "points_done",
+          "points_done_by_appeal",
+          "points_unserved",
+          "points_released",
+          "points_impeded",
+          "released_route_remainder",
+          "released_left_campus",
+          "released_location_silence",
+          "released_end_of_day",
           "executions_total",
           "executions_with_evidence",
           "executions_flagged",
-          "impediments_total",
           "alerts_total",
           "completion_rate"
         ],
         "title": "ComplianceTotalsOut",
-        "description": "Mirror of `ComplianceTotals` — the same shape as a row without the period identity."
+        "description": "Mirror of `ComplianceCounts` — the point-day indicators (spec 2026-10-20-alocacao-\nautomatica §8.7), the linked executions and alerts, and the derived `completion_rate`.\n`points_done` includes the ones done by appeal; `points_impeded` is the release counter of\nthe IMPEDIMENT reason."
       },
       "ConsentEntryOut": {
         "properties": {
@@ -6241,12 +6321,20 @@
           "cnpj": {
             "type": "string",
             "title": "Cnpj"
+          },
+          "service_types": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceTypeRow"
+            },
+            "type": "array",
+            "title": "Service Types"
           }
         },
         "type": "object",
         "required": [
           "name",
-          "cnpj"
+          "cnpj",
+          "service_types"
         ],
         "title": "ContractorCompanyCreateRequest"
       },
@@ -6264,13 +6352,21 @@
           "cnpj": {
             "type": "string",
             "title": "Cnpj"
+          },
+          "service_types": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyServiceTypeOut"
+            },
+            "type": "array",
+            "title": "Service Types"
           }
         },
         "type": "object",
         "required": [
           "id",
           "name",
-          "cnpj"
+          "cnpj",
+          "service_types"
         ],
         "title": "ContractorCompanyOut"
       },
@@ -6283,12 +6379,20 @@
           "cnpj": {
             "type": "string",
             "title": "Cnpj"
+          },
+          "service_types": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceTypeRow"
+            },
+            "type": "array",
+            "title": "Service Types"
           }
         },
         "type": "object",
         "required": [
           "name",
-          "cnpj"
+          "cnpj",
+          "service_types"
         ],
         "title": "ContractorCompanyUpdateRequest"
       },
@@ -6313,6 +6417,10 @@
           "photos": {
             "type": "integer",
             "title": "Photos"
+          },
+          "appeals": {
+            "type": "integer",
+            "title": "Appeals"
           }
         },
         "type": "object",
@@ -6321,7 +6429,8 @@
           "floors",
           "routes",
           "executions",
-          "photos"
+          "photos",
+          "appeals"
         ],
         "title": "DeletionImpactOut",
         "description": "What a removal takes with it — shown before the manager confirms."
@@ -6486,60 +6595,6 @@
         ],
         "title": "EvidenceSummaryOut"
       },
-      "ExecutionAssignmentOut": {
-        "properties": {
-          "field_worker_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Field Worker Id"
-          },
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "sequence": {
-            "type": "integer",
-            "title": "Sequence"
-          },
-          "assigned_by_name": {
-            "type": "string",
-            "title": "Assigned By Name"
-          },
-          "transfer_reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Transfer Reason"
-          },
-          "outcome": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Outcome"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_id",
-          "full_name",
-          "sequence",
-          "assigned_by_name",
-          "transfer_reason",
-          "outcome"
-        ],
-        "title": "ExecutionAssignmentOut",
-        "description": "One row of the stop's append-only assignment chain (RF21), surfaced on the execution\ndetail so the manager panel (Task 8) can show who was originally designated and why the\nstop moved. Named distinctly from `app.api.route_view.AssignmentOut`: FastAPI dedupes\nOpenAPI component schemas by class name, so two different classes sharing one name would\nsilently clobber each other in the contract (Task 5 hit this)."
-      },
       "ExecutionDetail": {
         "properties": {
           "execution_id": {
@@ -6641,6 +6696,18 @@
             ],
             "title": "Clock Skew Seconds"
           },
+          "appeal_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appeal Id"
+          },
           "scans": {
             "items": {
               "$ref": "#/components/schemas/ExecutionScan"
@@ -6654,16 +6721,6 @@
             },
             "type": "array",
             "title": "Evidence"
-          },
-          "manual_completion": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ManualCompletionOut"
-              },
-              {
-                "type": "null"
-              }
-            ]
           },
           "form_version_id": {
             "anyOf": [
@@ -6683,24 +6740,6 @@
             },
             "type": "array",
             "title": "Answers"
-          },
-          "reassigned": {
-            "type": "boolean",
-            "title": "Reassigned"
-          },
-          "assignment_history": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/ExecutionAssignmentOut"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Assignment History"
           }
         },
         "type": "object",
@@ -6722,13 +6761,11 @@
           "evidence_count",
           "route_id",
           "clock_skew_seconds",
+          "appeal_id",
           "scans",
           "evidence",
-          "manual_completion",
           "form_version_id",
-          "answers",
-          "reassigned",
-          "assignment_history"
+          "answers"
         ],
         "title": "ExecutionDetail"
       },
@@ -6924,6 +6961,18 @@
               }
             ],
             "title": "Clock Skew Seconds"
+          },
+          "appeal_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appeal Id"
           }
         },
         "type": "object",
@@ -6944,7 +6993,8 @@
           "source",
           "evidence_count",
           "route_id",
-          "clock_skew_seconds"
+          "clock_skew_seconds",
+          "appeal_id"
         ],
         "title": "ExecutionListItem"
       },
@@ -7021,46 +7071,6 @@
         ],
         "title": "ExecutionScan"
       },
-      "FieldWorkerCreateRequest": {
-        "properties": {
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "contractor_company_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "full_name",
-          "contractor_company_id",
-          "service_type_ids"
-        ],
-        "title": "FieldWorkerCreateRequest"
-      },
       "FieldWorkerOut": {
         "properties": {
           "id": {
@@ -7072,81 +7082,70 @@
             "type": "string",
             "title": "Full Name"
           },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
           "contractor_company_id": {
             "type": "string",
             "format": "uuid",
             "title": "Contractor Company Id"
           },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
+          "contractor_company_name": {
+            "type": "string",
+            "title": "Contractor Company Name"
           },
-          "user_id": {
+          "status": {
+            "$ref": "#/components/schemas/FieldWorkerStatus"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "rejection_reason": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "User Id"
+            "title": "Rejection Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "done_today": {
+            "type": "integer",
+            "title": "Done Today"
           }
         },
         "type": "object",
         "required": [
           "id",
           "full_name",
+          "email",
           "contractor_company_id",
-          "service_type_ids",
-          "user_id"
+          "contractor_company_name",
+          "status",
+          "is_active",
+          "rejection_reason",
+          "created_at",
+          "done_today"
         ],
         "title": "FieldWorkerOut"
       },
-      "FieldWorkerUpdateRequest": {
-        "properties": {
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "contractor_company_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "full_name",
-          "contractor_company_id",
-          "service_type_ids"
+      "FieldWorkerStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING_APPROVAL",
+          "APPROVED",
+          "REJECTED"
         ],
-        "title": "FieldWorkerUpdateRequest"
+        "title": "FieldWorkerStatus"
       },
       "FilterAppliedOut": {
         "properties": {
@@ -7160,6 +7159,17 @@
               }
             ],
             "title": "Field Worker Name"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name"
           },
           "service_type_name": {
             "anyOf": [
@@ -7183,7 +7193,7 @@
             ],
             "title": "Building Name"
           },
-          "route_status": {
+          "outcome": {
             "anyOf": [
               {
                 "type": "string"
@@ -7192,15 +7202,16 @@
                 "type": "null"
               }
             ],
-            "title": "Route Status"
+            "title": "Outcome"
           }
         },
         "type": "object",
         "required": [
           "field_worker_name",
+          "company_name",
           "service_type_name",
           "building_name",
-          "route_status"
+          "outcome"
         ],
         "title": "FilterAppliedOut",
         "description": "Mirror of `app.domain.reports.compliance.FilterApplied` — the human-readable echo of the\nfilters that were applied, with UUIDs already resolved to names by the builder."
@@ -7532,6 +7543,49 @@
             "type": "string",
             "format": "date-time",
             "title": "Received At"
+          },
+          "field_worker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Field Worker Id"
+          },
+          "field_worker_name": {
+            "type": "string",
+            "title": "Field Worker Name"
+          },
+          "service_point_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Point Name"
+          },
+          "building_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Building Name"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
           }
         },
         "type": "object",
@@ -7544,7 +7598,12 @@
           "note",
           "status",
           "reported_at",
-          "received_at"
+          "received_at",
+          "field_worker_id",
+          "field_worker_name",
+          "service_point_name",
+          "building_name",
+          "resolved_at"
         ],
         "title": "ImpedimentOut"
       },
@@ -7557,27 +7616,6 @@
           "OTHER"
         ],
         "title": "ImpedimentReason"
-      },
-      "ImpedimentReassignBody": {
-        "properties": {
-          "field_worker_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Field Worker Id"
-          },
-          "reason": {
-            "type": "string",
-            "maxLength": 300,
-            "minLength": 1,
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_id",
-          "reason"
-        ],
-        "title": "ImpedimentReassignBody"
       },
       "ImpedimentReportBody": {
         "properties": {
@@ -7654,31 +7692,6 @@
         ],
         "title": "IssueQrCodeRequest"
       },
-      "LinkableUserOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "email": {
-            "type": "string",
-            "title": "Email"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "email"
-        ],
-        "title": "LinkableUserOut",
-        "description": "Minimal projection for the dashboard /profissionais link-dropdown (Finding C2) — a\ndedicated model instead of importing UserOut from app/api/users.py, so this router stays\nself-contained per this repo's \"no cross-router imports\" convention."
-      },
       "LoginRequest": {
         "properties": {
           "email": {
@@ -7698,31 +7711,6 @@
         ],
         "title": "LoginRequest"
       },
-      "ManualCompletionOut": {
-        "properties": {
-          "completed_by": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Completed By"
-          },
-          "reason": {
-            "type": "string",
-            "title": "Reason"
-          },
-          "completed_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Completed At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "completed_by",
-          "reason",
-          "completed_at"
-        ],
-        "title": "ManualCompletionOut"
-      },
       "MarkAllReadOut": {
         "properties": {
           "marked": {
@@ -7736,31 +7724,45 @@
         ],
         "title": "MarkAllReadOut"
       },
-      "MaterializeBody": {
+      "MyDayOut": {
         "properties": {
-          "route_date": {
-            "type": "string",
-            "format": "date",
-            "title": "Route Date"
+          "service_day": {
+            "type": "boolean",
+            "title": "Service Day"
           },
-          "field_worker_id": {
+          "route": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "$ref": "#/components/schemas/RouteOut"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Field Worker Id"
+            ]
+          },
+          "position_report_interval_seconds": {
+            "type": "integer",
+            "title": "Position Report Interval Seconds"
+          },
+          "location_silence_warning_minutes": {
+            "type": "integer",
+            "title": "Location Silence Warning Minutes"
+          },
+          "location_silence_release_minutes": {
+            "type": "integer",
+            "title": "Location Silence Release Minutes"
           }
         },
         "type": "object",
         "required": [
-          "route_date"
+          "service_day",
+          "route",
+          "position_report_interval_seconds",
+          "location_silence_warning_minutes",
+          "location_silence_release_minutes"
         ],
-        "title": "MaterializeBody"
+        "title": "MyDayOut",
+        "description": "The worker's day for the app: today's route, if any, and the location-silence limits it\nwarns the worker about (spec §7.3)."
       },
       "MyFieldWorkerOut": {
         "properties": {
@@ -7777,22 +7779,13 @@
             "type": "string",
             "format": "uuid",
             "title": "Contractor Company Id"
-          },
-          "service_type_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Service Type Ids"
           }
         },
         "type": "object",
         "required": [
           "id",
           "full_name",
-          "contractor_company_id",
-          "service_type_ids"
+          "contractor_company_id"
         ],
         "title": "MyFieldWorkerOut"
       },
@@ -7890,50 +7883,6 @@
           "unread"
         ],
         "title": "NotificationsSummaryOut"
-      },
-      "OccasionalRouteBody": {
-        "properties": {
-          "field_worker_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Field Worker Ids"
-          },
-          "route_date": {
-            "type": "string",
-            "format": "date",
-            "title": "Route Date"
-          },
-          "scheduled_start_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduled Start At"
-          },
-          "stops": {
-            "items": {
-              "$ref": "#/components/schemas/StopBody"
-            },
-            "type": "array",
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_ids",
-          "route_date",
-          "stops"
-        ],
-        "title": "OccasionalRouteBody"
       },
       "PagedExecutions": {
         "properties": {
@@ -8114,6 +8063,51 @@
         ],
         "title": "PolygonFootprint"
       },
+      "PoolKpi": {
+        "properties": {
+          "service_type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Type Id"
+          },
+          "service_type_name": {
+            "type": "string",
+            "title": "Service Type Name"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "in_progress": {
+            "type": "integer",
+            "title": "In Progress"
+          },
+          "free": {
+            "type": "integer",
+            "title": "Free"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_type_id",
+          "service_type_name",
+          "company_name",
+          "total",
+          "done",
+          "in_progress",
+          "free"
+        ],
+        "title": "PoolKpi",
+        "description": "Today's typed points of one service type: `done` (served, also by appeal) + `in_progress`\n(in somebody's batch) + `free` (in the pool) = `total`."
+      },
       "ProfileOut": {
         "properties": {
           "id": {
@@ -8153,6 +8147,25 @@
           "created_at"
         ],
         "title": "ProfileOut"
+      },
+      "PublicCompanyOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PublicCompanyOut"
       },
       "PublishedVersionResponse": {
         "properties": {
@@ -8268,56 +8281,6 @@
         ],
         "title": "QuestionType"
       },
-      "ReassignBody": {
-        "properties": {
-          "field_worker_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Field Worker Id"
-          },
-          "reason": {
-            "type": "string",
-            "maxLength": 300,
-            "minLength": 1,
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_id",
-          "reason"
-        ],
-        "title": "ReassignBody"
-      },
-      "ReassignCandidateOut": {
-        "properties": {
-          "field_worker_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Field Worker Id"
-          },
-          "full_name": {
-            "type": "string",
-            "title": "Full Name"
-          },
-          "distance_m": {
-            "type": "number",
-            "title": "Distance M"
-          },
-          "pending_stop_count": {
-            "type": "integer",
-            "title": "Pending Stop Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_id",
-          "full_name",
-          "distance_m",
-          "pending_stop_count"
-        ],
-        "title": "ReassignCandidateOut"
-      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -8330,6 +8293,86 @@
           "refresh_token"
         ],
         "title": "RefreshRequest"
+      },
+      "RegisterRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 8,
+            "title": "Password"
+          },
+          "contractor_company_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractor Company Id"
+          },
+          "privacy_notice_version": {
+            "type": "integer",
+            "title": "Privacy Notice Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password",
+          "contractor_company_id",
+          "privacy_notice_version"
+        ],
+        "title": "RegisterRequest"
+      },
+      "RegisterResponse": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/FieldWorkerStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "RegisterResponse"
+      },
+      "RejectRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "title": "RejectRequest"
+      },
+      "ReleaseReason": {
+        "type": "string",
+        "enum": [
+          "IMPEDIMENT",
+          "ROUTE_REMAINDER",
+          "LEFT_CAMPUS",
+          "LOCATION_SILENCE",
+          "END_OF_DAY"
+        ],
+        "title": "ReleaseReason"
       },
       "ReorderBody": {
         "properties": {
@@ -8387,55 +8430,6 @@
         ],
         "title": "RevokeQrCodeRequest"
       },
-      "RouteCreateBody": {
-        "properties": {
-          "field_worker_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Field Worker Id"
-          },
-          "route_date": {
-            "type": "string",
-            "format": "date",
-            "title": "Route Date"
-          },
-          "route_type": {
-            "type": "string",
-            "enum": [
-              "REGULAR",
-              "OCCASIONAL"
-            ],
-            "title": "Route Type",
-            "default": "REGULAR"
-          },
-          "scheduled_start_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduled Start At"
-          },
-          "stops": {
-            "items": {
-              "$ref": "#/components/schemas/StopBody"
-            },
-            "type": "array",
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "required": [
-          "field_worker_id",
-          "route_date",
-          "stops"
-        ],
-        "title": "RouteCreateBody"
-      },
       "RouteOut": {
         "properties": {
           "id": {
@@ -8457,25 +8451,9 @@
             "format": "date",
             "title": "Route Date"
           },
-          "route_type": {
-            "type": "string",
-            "title": "Route Type"
-          },
           "status": {
             "type": "string",
             "title": "Status"
-          },
-          "scheduled_start_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduled Start At"
           },
           "started_at": {
             "anyOf": [
@@ -8493,6 +8471,10 @@
             "type": "boolean",
             "title": "Routing Degraded"
           },
+          "current_batch": {
+            "type": "integer",
+            "title": "Current Batch"
+          },
           "stops": {
             "items": {
               "$ref": "#/components/schemas/RouteStopOut"
@@ -8507,11 +8489,10 @@
           "field_worker_id",
           "field_worker_name",
           "route_date",
-          "route_type",
           "status",
-          "scheduled_start_at",
           "started_at",
           "routing_degraded",
+          "current_batch",
           "stops"
         ],
         "title": "RouteOut"
@@ -8527,9 +8508,23 @@
             "type": "integer",
             "title": "Order Index"
           },
+          "batch_number": {
+            "type": "integer",
+            "title": "Batch Number"
+          },
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "release_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReleaseReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "service_point_id": {
             "type": "string",
@@ -8555,30 +8550,6 @@
           "longitude": {
             "type": "number",
             "title": "Longitude"
-          },
-          "expected_arrival_from": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival From"
-          },
-          "expected_arrival_to": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival To"
           },
           "distance_from_prev_m": {
             "anyOf": [
@@ -8651,105 +8622,39 @@
                 "type": "null"
               }
             ]
-          },
-          "reassigned": {
-            "type": "boolean",
-            "title": "Reassigned"
-          },
-          "assignment_history": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/AssignmentOut"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Assignment History"
           }
         },
         "type": "object",
         "required": [
           "id",
           "order_index",
+          "batch_number",
           "status",
+          "release_reason",
           "service_point_id",
           "service_point_name",
           "floor_label",
           "building_name",
           "latitude",
           "longitude",
-          "expected_arrival_from",
-          "expected_arrival_to",
           "distance_from_prev_m",
           "duration_from_prev_s",
           "leg_geometry",
           "service_type_id",
           "service_type_name",
-          "form",
-          "reassigned",
-          "assignment_history"
+          "form"
         ],
         "title": "RouteStopOut"
       },
-      "RouteUpdateBody": {
-        "properties": {
-          "field_worker_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Field Worker Id"
-          },
-          "route_date": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Route Date"
-          },
-          "scheduled_start_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduled Start At"
-          },
-          "stops": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/StopBody"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "title": "RouteUpdateBody"
+      "RouteStopStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "IN_PROGRESS",
+          "DONE",
+          "RELEASED"
+        ],
+        "title": "RouteStopStatus"
       },
       "ServicePointCreateRequest": {
         "properties": {
@@ -8765,6 +8670,11 @@
           "description": {
             "type": "string",
             "title": "Description"
+          },
+          "service_type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Type Id"
           }
         },
         "additionalProperties": false,
@@ -8772,7 +8682,8 @@
         "required": [
           "floor_id",
           "name",
-          "description"
+          "description",
+          "service_type_id"
         ],
         "title": "ServicePointCreateRequest"
       },
@@ -8803,6 +8714,29 @@
           "longitude": {
             "type": "number",
             "title": "Longitude"
+          },
+          "service_type_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Type Id"
+          },
+          "service_type_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Type Name"
           }
         },
         "type": "object",
@@ -8812,7 +8746,9 @@
           "name",
           "description",
           "latitude",
-          "longitude"
+          "longitude",
+          "service_type_id",
+          "service_type_name"
         ],
         "title": "ServicePointOut"
       },
@@ -8825,6 +8761,18 @@
           "description": {
             "type": "string",
             "title": "Description"
+          },
+          "service_type_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Type Id"
           }
         },
         "additionalProperties": false,
@@ -8834,24 +8782,6 @@
           "description"
         ],
         "title": "ServicePointUpdateRequest"
-      },
-      "ServiceTypeCreateRequest": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "average_duration_minutes": {
-            "type": "integer",
-            "title": "Average Duration Minutes"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "average_duration_minutes"
-        ],
-        "title": "ServiceTypeCreateRequest"
       },
       "ServiceTypeOut": {
         "properties": {
@@ -8867,33 +8797,74 @@
           "average_duration_minutes": {
             "type": "integer",
             "title": "Average Duration Minutes"
+          },
+          "contractor_company_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Company Id"
+          },
+          "contractor_company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Company Name"
           }
         },
         "type": "object",
         "required": [
           "id",
           "name",
-          "average_duration_minutes"
+          "average_duration_minutes",
+          "contractor_company_id",
+          "contractor_company_name"
         ],
         "title": "ServiceTypeOut"
       },
-      "ServiceTypeUpdateRequest": {
+      "ServiceTypeRow": {
         "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
           "name": {
             "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
             "title": "Name"
           },
           "average_duration_minutes": {
             "type": "integer",
-            "title": "Average Duration Minutes"
+            "exclusiveMinimum": 0.0,
+            "title": "Average Duration Minutes",
+            "default": 30
           }
         },
         "type": "object",
         "required": [
-          "name",
-          "average_duration_minutes"
+          "name"
         ],
-        "title": "ServiceTypeUpdateRequest"
+        "title": "ServiceTypeRow",
+        "description": "One line of the company dialog: a type to keep (`id` set) or to create (`id` empty)."
       },
       "SettingsOut": {
         "properties": {
@@ -8905,18 +8876,6 @@
             "type": "integer",
             "title": "Alert Scan Interval Seconds"
           },
-          "late_start_tolerance_min": {
-            "type": "integer",
-            "title": "Late Start Tolerance Min"
-          },
-          "absence_tolerance_min": {
-            "type": "integer",
-            "title": "Absence Tolerance Min"
-          },
-          "late_stop_tolerance_min": {
-            "type": "integer",
-            "title": "Late Stop Tolerance Min"
-          },
           "no_evidence_grace_min": {
             "type": "integer",
             "title": "No Evidence Grace Min"
@@ -8924,6 +8883,54 @@
           "position_report_interval_seconds": {
             "type": "integer",
             "title": "Position Report Interval Seconds"
+          },
+          "allocation_batch_size": {
+            "type": "integer",
+            "title": "Allocation Batch Size"
+          },
+          "campus_min_lat": {
+            "type": "number",
+            "title": "Campus Min Lat"
+          },
+          "campus_max_lat": {
+            "type": "number",
+            "title": "Campus Max Lat"
+          },
+          "campus_min_lng": {
+            "type": "number",
+            "title": "Campus Min Lng"
+          },
+          "campus_max_lng": {
+            "type": "number",
+            "title": "Campus Max Lng"
+          },
+          "outside_campus_release_minutes": {
+            "type": "integer",
+            "title": "Outside Campus Release Minutes"
+          },
+          "location_silence_warning_minutes": {
+            "type": "integer",
+            "title": "Location Silence Warning Minutes"
+          },
+          "location_silence_release_minutes": {
+            "type": "integer",
+            "title": "Location Silence Release Minutes"
+          },
+          "workday_end_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Workday End Time"
+          },
+          "service_weekdays": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Service Weekdays"
+          },
+          "appeal_window_hours": {
+            "type": "integer",
+            "title": "Appeal Window Hours"
           },
           "updated_at": {
             "anyOf": [
@@ -8942,11 +8949,19 @@
         "required": [
           "check_radius_meters",
           "alert_scan_interval_seconds",
-          "late_start_tolerance_min",
-          "absence_tolerance_min",
-          "late_stop_tolerance_min",
           "no_evidence_grace_min",
           "position_report_interval_seconds",
+          "allocation_batch_size",
+          "campus_min_lat",
+          "campus_max_lat",
+          "campus_min_lng",
+          "campus_max_lng",
+          "outside_campus_release_minutes",
+          "location_silence_warning_minutes",
+          "location_silence_release_minutes",
+          "workday_end_time",
+          "service_weekdays",
+          "appeal_window_hours",
           "updated_at"
         ],
         "title": "SettingsOut"
@@ -8979,45 +8994,6 @@
             ],
             "title": "Alert Scan Interval Seconds"
           },
-          "late_start_tolerance_min": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1440.0,
-                "minimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Late Start Tolerance Min"
-          },
-          "absence_tolerance_min": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1440.0,
-                "minimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Absence Tolerance Min"
-          },
-          "late_stop_tolerance_min": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1440.0,
-                "minimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Late Stop Tolerance Min"
-          },
           "no_evidence_grace_min": {
             "anyOf": [
               {
@@ -9043,400 +9019,157 @@
               }
             ],
             "title": "Position Report Interval Seconds"
+          },
+          "allocation_batch_size": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 50.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allocation Batch Size"
+          },
+          "campus_min_lat": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus Min Lat"
+          },
+          "campus_max_lat": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus Max Lat"
+          },
+          "campus_min_lng": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus Min Lng"
+          },
+          "campus_max_lng": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus Max Lng"
+          },
+          "outside_campus_release_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1440.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outside Campus Release Minutes"
+          },
+          "location_silence_warning_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1440.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Silence Warning Minutes"
+          },
+          "location_silence_release_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1440.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Silence Release Minutes"
+          },
+          "workday_end_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workday End Time"
+          },
+          "service_weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer",
+                  "maximum": 6.0,
+                  "minimum": 0.0
+                },
+                "type": "array",
+                "maxItems": 7,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Weekdays"
+          },
+          "appeal_window_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 720.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appeal Window Hours"
           }
         },
         "type": "object",
         "title": "SettingsUpdate"
-      },
-      "StartRouteRequest": {
-        "properties": {
-          "latitude": {
-            "type": "number",
-            "title": "Latitude"
-          },
-          "longitude": {
-            "type": "number",
-            "title": "Longitude"
-          },
-          "started_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Started At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "latitude",
-          "longitude",
-          "started_at"
-        ],
-        "title": "StartRouteRequest"
-      },
-      "StopBody": {
-        "properties": {
-          "service_point_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Service Point Id"
-          },
-          "expected_arrival_from": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival From"
-          },
-          "expected_arrival_to": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival To"
-          },
-          "service_type_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Service Type Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "service_point_id"
-        ],
-        "title": "StopBody"
-      },
-      "TemplateCreateBody": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "field_worker_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Field Worker Id"
-          },
-          "recurrence": {
-            "type": "string",
-            "enum": [
-              "DAILY",
-              "WEEKLY"
-            ],
-            "title": "Recurrence"
-          },
-          "weekdays": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Weekdays"
-          },
-          "route_type": {
-            "type": "string",
-            "enum": [
-              "REGULAR",
-              "OCCASIONAL"
-            ],
-            "title": "Route Type",
-            "default": "REGULAR"
-          },
-          "stops": {
-            "items": {
-              "$ref": "#/components/schemas/TemplateStopBody"
-            },
-            "type": "array",
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "recurrence",
-          "stops"
-        ],
-        "title": "TemplateCreateBody"
-      },
-      "TemplateOut": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "field_worker_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Field Worker Id"
-          },
-          "recurrence": {
-            "type": "string",
-            "title": "Recurrence"
-          },
-          "weekdays": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Weekdays"
-          },
-          "route_type": {
-            "type": "string",
-            "title": "Route Type"
-          },
-          "is_active": {
-            "type": "boolean",
-            "title": "Is Active"
-          },
-          "stops": {
-            "items": {
-              "$ref": "#/components/schemas/TemplateStopOut"
-            },
-            "type": "array",
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "field_worker_id",
-          "recurrence",
-          "weekdays",
-          "route_type",
-          "is_active",
-          "stops"
-        ],
-        "title": "TemplateOut"
-      },
-      "TemplateStopBody": {
-        "properties": {
-          "service_point_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Service Point Id"
-          },
-          "expected_arrival_from": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival From"
-          },
-          "expected_arrival_to": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival To"
-          }
-        },
-        "type": "object",
-        "required": [
-          "service_point_id"
-        ],
-        "title": "TemplateStopBody"
-      },
-      "TemplateStopOut": {
-        "properties": {
-          "service_point_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Service Point Id"
-          },
-          "order_index": {
-            "type": "integer",
-            "title": "Order Index"
-          },
-          "expected_arrival_from": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival From"
-          },
-          "expected_arrival_to": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expected Arrival To"
-          }
-        },
-        "type": "object",
-        "required": [
-          "service_point_id",
-          "order_index",
-          "expected_arrival_from",
-          "expected_arrival_to"
-        ],
-        "title": "TemplateStopOut"
-      },
-      "TemplateUpdateBody": {
-        "properties": {
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "field_worker_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Field Worker Id"
-          },
-          "recurrence": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "DAILY",
-                  "WEEKLY"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Recurrence"
-          },
-          "weekdays": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Weekdays"
-          },
-          "route_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "REGULAR",
-                  "OCCASIONAL"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Route Type"
-          },
-          "is_active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Active"
-          },
-          "stops": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/TemplateStopBody"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "title": "TemplateUpdateBody"
       },
       "TimeSpanOut": {
         "properties": {
@@ -9479,6 +9212,38 @@
       },
       "TokenResponse": {
         "properties": {
+          "worker_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FieldWorkerStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "worker_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worker Active"
+          },
           "access_token": {
             "type": "string",
             "title": "Access Token"
@@ -9740,6 +9505,30 @@
           "accuracy_m"
         ],
         "title": "WorkerPositionOut"
+      },
+      "WorkerRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "company_name"
+        ],
+        "title": "WorkerRef"
       }
     },
     "securitySchemes": {
