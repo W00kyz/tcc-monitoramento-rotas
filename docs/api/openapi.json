@@ -2840,342 +2840,6 @@
         ]
       }
     },
-    "/service-types/{service_type_id}/form": {
-      "get": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Get Form",
-        "operationId": "get_form_service_types__service_type_id__form_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "service_type_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Service Type Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormOverviewResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/forms/{form_id}/draft/questions": {
-      "post": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Create Question",
-        "operationId": "create_question_forms__form_id__draft_questions_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "form_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Form Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/QuestionBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormVersionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/forms/{form_id}/draft/questions/{stable_key}": {
-      "patch": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Patch Question",
-        "operationId": "patch_question_forms__form_id__draft_questions__stable_key__patch",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "form_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Form Id"
-            }
-          },
-          {
-            "name": "stable_key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Stable Key"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/QuestionBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormVersionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Delete Question",
-        "operationId": "delete_question_forms__form_id__draft_questions__stable_key__delete",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "form_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Form Id"
-            }
-          },
-          {
-            "name": "stable_key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Stable Key"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormVersionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/forms/{form_id}/draft/order": {
-      "put": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Put Order",
-        "operationId": "put_order_forms__form_id__draft_order_put",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "form_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Form Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReorderBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormVersionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/forms/{form_id}/publish": {
-      "post": {
-        "tags": [
-          "forms"
-        ],
-        "summary": "Publish",
-        "operationId": "publish_forms__form_id__publish_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "form_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Form Id"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FormVersionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/routes/{route_id}/impediments": {
       "post": {
         "tags": [
@@ -4967,64 +4631,6 @@
         ],
         "title": "AllocationOut"
       },
-      "AnswerInBody": {
-        "properties": {
-          "stable_key": {
-            "type": "string",
-            "title": "Stable Key"
-          },
-          "value": {
-            "title": "Value"
-          }
-        },
-        "type": "object",
-        "required": [
-          "stable_key",
-          "value"
-        ],
-        "title": "AnswerInBody"
-      },
-      "AnswerOut": {
-        "properties": {
-          "question_stable_key": {
-            "type": "string",
-            "title": "Question Stable Key"
-          },
-          "prompt": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Prompt"
-          },
-          "value": {
-            "title": "Value"
-          },
-          "question_type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Question Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "question_stable_key",
-          "prompt",
-          "value",
-          "question_type"
-        ],
-        "title": "AnswerOut"
-      },
       "AppealBody": {
         "properties": {
           "route_stop_id": {
@@ -5946,31 +5552,17 @@
             ],
             "title": "Client Clock Offset Seconds"
           },
-          "form_version_id": {
+          "complaints_suggestions": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "maxLength": 2000
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Form Version Id"
-          },
-          "answers": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/AnswerInBody"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Answers"
+            "title": "Complaints Suggestions"
           }
         },
         "type": "object",
@@ -6034,13 +5626,18 @@
           "average_duration_minutes": {
             "type": "integer",
             "title": "Average Duration Minutes"
+          },
+          "requires_evidence": {
+            "type": "boolean",
+            "title": "Requires Evidence"
           }
         },
         "type": "object",
         "required": [
           "id",
           "name",
-          "average_duration_minutes"
+          "average_duration_minutes",
+          "requires_evidence"
         ],
         "title": "CompanyServiceTypeOut"
       },
@@ -6435,29 +6032,6 @@
         "title": "DeletionImpactOut",
         "description": "What a removal takes with it — shown before the manager confirms."
       },
-      "EmbeddedForm": {
-        "properties": {
-          "form_version_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Form Version Id"
-          },
-          "questions": {
-            "items": {
-              "$ref": "#/components/schemas/FormQuestionField"
-            },
-            "type": "array",
-            "title": "Questions"
-          }
-        },
-        "type": "object",
-        "required": [
-          "form_version_id",
-          "questions"
-        ],
-        "title": "EmbeddedForm",
-        "description": "The stop's active PUBLISHED execution form, shipped inside `GET /routes/me` so the app\nhas the schema (with hashes) before it goes offline (spec §5.2, Etapa 7)."
-      },
       "EvidenceItemOut": {
         "properties": {
           "id": {
@@ -6722,24 +6296,16 @@
             "type": "array",
             "title": "Evidence"
           },
-          "form_version_id": {
+          "complaints_suggestions": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Form Version Id"
-          },
-          "answers": {
-            "items": {
-              "$ref": "#/components/schemas/AnswerOut"
-            },
-            "type": "array",
-            "title": "Answers"
+            "title": "Complaints Suggestions"
           }
         },
         "type": "object",
@@ -6764,8 +6330,7 @@
           "appeal_id",
           "scans",
           "evidence",
-          "form_version_id",
-          "answers"
+          "complaints_suggestions"
         ],
         "title": "ExecutionDetail"
       },
@@ -7272,196 +6837,6 @@
           "label"
         ],
         "title": "FloorUpdateRequest"
-      },
-      "FormOverviewResponse": {
-        "properties": {
-          "form_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Form Id"
-          },
-          "service_type_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Service Type Id"
-          },
-          "draft": {
-            "$ref": "#/components/schemas/FormVersionResponse"
-          },
-          "published": {
-            "items": {
-              "$ref": "#/components/schemas/PublishedVersionResponse"
-            },
-            "type": "array",
-            "title": "Published"
-          }
-        },
-        "type": "object",
-        "required": [
-          "form_id",
-          "service_type_id",
-          "draft",
-          "published"
-        ],
-        "title": "FormOverviewResponse"
-      },
-      "FormQuestionField": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "stable_key": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Stable Key"
-          },
-          "order_index": {
-            "type": "integer",
-            "title": "Order Index"
-          },
-          "prompt": {
-            "type": "string",
-            "title": "Prompt"
-          },
-          "question_type": {
-            "$ref": "#/components/schemas/QuestionType"
-          },
-          "required": {
-            "type": "boolean",
-            "title": "Required"
-          },
-          "options": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Options"
-          },
-          "content_hash": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content Hash"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "stable_key",
-          "order_index",
-          "prompt",
-          "question_type",
-          "required",
-          "options",
-          "content_hash"
-        ],
-        "title": "FormQuestionField",
-        "description": "One question of the embedded form, mirroring `FormQuestionOut`. `content_hash` is the\nper-question fingerprint the app pins each answer to while offline (spec §5.2)."
-      },
-      "FormQuestionResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "stable_key": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Stable Key"
-          },
-          "order_index": {
-            "type": "integer",
-            "title": "Order Index"
-          },
-          "prompt": {
-            "type": "string",
-            "title": "Prompt"
-          },
-          "question_type": {
-            "$ref": "#/components/schemas/QuestionType"
-          },
-          "required": {
-            "type": "boolean",
-            "title": "Required"
-          },
-          "options": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Options"
-          },
-          "content_hash": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content Hash"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "stable_key",
-          "order_index",
-          "prompt",
-          "question_type",
-          "required",
-          "options",
-          "content_hash"
-        ],
-        "title": "FormQuestionResponse"
-      },
-      "FormVersionResponse": {
-        "properties": {
-          "form_version_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Form Version Id"
-          },
-          "status": {
-            "$ref": "#/components/schemas/FormVersionStatus"
-          },
-          "version_number": {
-            "type": "integer",
-            "title": "Version Number"
-          },
-          "questions": {
-            "items": {
-              "$ref": "#/components/schemas/FormQuestionResponse"
-            },
-            "type": "array",
-            "title": "Questions"
-          }
-        },
-        "type": "object",
-        "required": [
-          "form_version_id",
-          "status",
-          "version_number",
-          "questions"
-        ],
-        "title": "FormVersionResponse"
-      },
-      "FormVersionStatus": {
-        "type": "string",
-        "enum": [
-          "DRAFT",
-          "PUBLISHED"
-        ],
-        "title": "FormVersionStatus"
       },
       "HTTPValidationError": {
         "properties": {
@@ -8167,43 +7542,6 @@
         ],
         "title": "PublicCompanyOut"
       },
-      "PublishedVersionResponse": {
-        "properties": {
-          "form_version_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Form Version Id"
-          },
-          "version_number": {
-            "type": "integer",
-            "title": "Version Number"
-          },
-          "published_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Published At"
-          },
-          "question_count": {
-            "type": "integer",
-            "title": "Question Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "form_version_id",
-          "version_number",
-          "published_at",
-          "question_count"
-        ],
-        "title": "PublishedVersionResponse"
-      },
       "QrCodeOut": {
         "properties": {
           "id": {
@@ -8238,48 +7576,6 @@
           "status"
         ],
         "title": "QrCodeOut"
-      },
-      "QuestionBody": {
-        "properties": {
-          "prompt": {
-            "type": "string",
-            "title": "Prompt"
-          },
-          "question_type": {
-            "$ref": "#/components/schemas/QuestionType"
-          },
-          "required": {
-            "type": "boolean",
-            "title": "Required"
-          },
-          "options": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Options",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "prompt",
-          "question_type",
-          "required"
-        ],
-        "title": "QuestionBody"
-      },
-      "QuestionType": {
-        "type": "string",
-        "enum": [
-          "TEXT",
-          "NUMBER",
-          "BOOLEAN",
-          "SINGLE_CHOICE",
-          "MULTI_CHOICE",
-          "MEDIA"
-        ],
-        "title": "QuestionType"
       },
       "RefreshRequest": {
         "properties": {
@@ -8373,23 +7669,6 @@
           "END_OF_DAY"
         ],
         "title": "ReleaseReason"
-      },
-      "ReorderBody": {
-        "properties": {
-          "stable_keys": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Stable Keys"
-          }
-        },
-        "type": "object",
-        "required": [
-          "stable_keys"
-        ],
-        "title": "ReorderBody"
       },
       "ReportGranularity": {
         "type": "string",
@@ -8613,15 +7892,9 @@
             ],
             "title": "Service Type Name"
           },
-          "form": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/EmbeddedForm"
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "requires_evidence": {
+            "type": "boolean",
+            "title": "Requires Evidence"
           }
         },
         "type": "object",
@@ -8642,7 +7915,7 @@
           "leg_geometry",
           "service_type_id",
           "service_type_name",
-          "form"
+          "requires_evidence"
         ],
         "title": "RouteStopOut"
       },
@@ -8798,6 +8071,10 @@
             "type": "integer",
             "title": "Average Duration Minutes"
           },
+          "requires_evidence": {
+            "type": "boolean",
+            "title": "Requires Evidence"
+          },
           "contractor_company_id": {
             "anyOf": [
               {
@@ -8827,6 +8104,7 @@
           "id",
           "name",
           "average_duration_minutes",
+          "requires_evidence",
           "contractor_company_id",
           "contractor_company_name"
         ],
@@ -8857,6 +8135,11 @@
             "exclusiveMinimum": 0.0,
             "title": "Average Duration Minutes",
             "default": 30
+          },
+          "requires_evidence": {
+            "type": "boolean",
+            "title": "Requires Evidence",
+            "default": false
           }
         },
         "type": "object",
