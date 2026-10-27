@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Primary: the manager (gestora/gestor) of the Prefeitura Universitária (PU) at UFCG, working at a desktop in the office. They plan routes, follow execution live, handle alerts, and produce reports to inspect outsourced contracts. Use is daily and prolonged.
+Primary: the manager (gestora/gestor) of the Prefeitura Universitária (PU) at UFCG, working at a desktop in the office. They register companies, buildings and service points, follow execution live, handle alerts and appeals, and produce reports to inspect outsourced contracts. Use is daily and prolonged.
 
 Other roles that exist in the system (from the requirements document): the system administrator (users, access profiles, parameters such as check-in tolerance radius, audit logs) and the field worker (outsourced company staff, mobile app only, out of scope for the dashboard design work).
 
@@ -22,7 +22,7 @@ Check-in proof comes from signed QR Codes crossed with GPS, with offline executi
 
 ## Operating Context
 
-Manager sits at a desktop with a browser, watching a live board of routes and worker positions on an offline-capable map (OSM, PMTiles). Daily route assignment, emergency substitution and reassignment of points, one-off event routes, dynamic checklist forms per service type, alerts and notifications, historical reports with filters and export. Seed users: admin, gestora, field worker.
+Manager sits at a desktop with a browser, watching a live board of routes and worker positions on an offline-capable map (OSM, PMTiles). There is no manual route assignment: workers pull batches of the nearest free service points of their company's service types, and points return to a shared daily pool on impediment, leaving campus, location silence or end of day. Workers self-register in the app and the manager approves them; service types belong to the company. The manager registers companies, buildings and service points, follows execution and alerts, receives justifications and appeals, and produces historical reports with filters and export. Dynamic checklist forms per service type. Seed users: admin, gestora, field worker.
 
 ## Capabilities and Constraints
 
