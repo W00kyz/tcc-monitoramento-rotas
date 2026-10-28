@@ -461,6 +461,73 @@
         ]
       }
     },
+    "/routes/me/approach": {
+      "get": {
+        "tags": [
+          "routes"
+        ],
+        "summary": "My Approach",
+        "description": "The street leg from `(lat, lng)` to the worker's next stop: the first PENDING stop of\ntoday's current batch, in route order. 204 when there is none; 503 with `OSRM_UNAVAILABLE`\nwhen OSRM cannot answer — the server never falls back to a straight line itself.",
+        "operationId": "my_approach_routes_me_approach_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Lng"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproachOut"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No route today, or no PENDING stop in its current batch."
+          },
+          "503": {
+            "description": "OSRM is unavailable or cannot route the leg; draw a straight line."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/routes/start": {
       "post": {
         "tags": [
@@ -4899,6 +4966,42 @@
           "deadline"
         ],
         "title": "AppealableStopOut"
+      },
+      "ApproachOut": {
+        "properties": {
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "geometry": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Geometry"
+          },
+          "distance_m": {
+            "type": "number",
+            "title": "Distance M"
+          },
+          "duration_s": {
+            "type": "number",
+            "title": "Duration S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_stop_id",
+          "geometry",
+          "distance_m",
+          "duration_s"
+        ],
+        "title": "ApproachOut",
+        "description": "The live first leg: the street path from the worker's position to the next stop. Never\nstored; the app asks again as the worker moves."
       },
       "AuthEventOut": {
         "properties": {
