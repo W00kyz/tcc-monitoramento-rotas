@@ -7822,6 +7822,11 @@
             "type": "string",
             "title": "Building Name"
           },
+          "building_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Building Id"
+          },
           "latitude": {
             "type": "number",
             "title": "Latitude"
@@ -7895,6 +7900,18 @@
           "requires_evidence": {
             "type": "boolean",
             "title": "Requires Evidence"
+          },
+          "done_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done At"
           }
         },
         "type": "object",
@@ -7908,6 +7925,7 @@
           "service_point_name",
           "floor_label",
           "building_name",
+          "building_id",
           "latitude",
           "longitude",
           "distance_from_prev_m",
@@ -7915,7 +7933,8 @@
           "leg_geometry",
           "service_type_id",
           "service_type_name",
-          "requires_evidence"
+          "requires_evidence",
+          "done_at"
         ],
         "title": "RouteStopOut"
       },
