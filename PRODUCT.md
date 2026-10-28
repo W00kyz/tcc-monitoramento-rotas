@@ -4,13 +4,13 @@
 
 ## Platform
 
-web
+web (dashboard, `dashboard/`); android (field app, `mobile/`, Flutter, minSdk 26)
 
 ## Users
 
 Primary: the manager (gestora/gestor) of the Prefeitura Universitária (PU) at UFCG, working at a desktop in the office. They register companies, buildings and service points, follow execution live, handle alerts and appeals, and produce reports to inspect outsourced contracts. Use is daily and prolonged.
 
-Other roles that exist in the system (from the requirements document): the system administrator (users, access profiles, parameters such as check-in tolerance radius, audit logs) and the field worker (outsourced company staff, mobile app only, out of scope for the dashboard design work).
+Other roles that exist in the system (from the requirements document): the system administrator (users, access profiles, parameters such as check-in tolerance radius, audit logs) and the field worker (outsourced company staff, mobile app only): walks the campus all day with a modest Android phone, often in strong sun, sometimes in basements with no signal, frequently one-handed.
 
 ## Product Purpose
 
@@ -31,9 +31,12 @@ Manager sits at a desktop with a browser, watching a live board of routes and wo
 - Dashboard overview must load within 5 seconds (RNF05); must work correctly across the supported browsers (RNF15).
 - LGPD adherence, geolocation only during working hours, audit trail of sensitive operations (RNF10-12).
 - Stack: React 19, TypeScript, Vite, Tailwind, shadcn/Radix, Leaflet; API client generated from OpenAPI. Backend FastAPI/PostgreSQL; mobile Flutter (Android now, iOS 13+ required by RNF14).
-- Mobile app is out of scope for Impeccable work; only the dashboard is.
+- Both surfaces are in scope for Impeccable work: the dashboard (web) and the field app (Android, Material 3, offline-first; local SQLite is the source of truth, RNF06).
 
 ## Brand Commitments
+
+Field app gamification is personal only (the worker's own progress, streak, achievements, computed on the device): no ranking between workers, no prizes, nothing that reads as pressure or surveillance.
+
 
 No UFCG/PU institutional identity is imposed: the dashboard has its own identity. Existing typography in the code is IBM Plex Sans/Mono, recorded as incumbent evidence, not a binding choice.
 
@@ -51,4 +54,4 @@ Real requirements document, specs per etapa in `docs/specs/`, and a working dash
 
 ## Accessibility & Inclusion
 
-WCAG 2.1 AA as the minimum standard for the dashboard. pt-BR only. (RNF01, sunlight legibility, applies to the mobile app.)
+WCAG 2.1 AA as the minimum standard for the dashboard and the field app; field-app states must also read without colour (sunlight, colour blindness). pt-BR only. (RNF01, sunlight legibility, applies to the mobile app.)
