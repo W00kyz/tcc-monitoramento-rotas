@@ -7913,6 +7913,11 @@
             "format": "uuid",
             "title": "Service Point Id"
           },
+          "floor_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Floor Id"
+          },
           "service_point_name": {
             "type": "string",
             "title": "Service Point Name"
@@ -8025,6 +8030,7 @@
           "status",
           "release_reason",
           "service_point_id",
+          "floor_id",
           "service_point_name",
           "floor_label",
           "building_name",
