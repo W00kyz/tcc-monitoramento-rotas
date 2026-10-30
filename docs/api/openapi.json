@@ -774,6 +774,52 @@
         ]
       }
     },
+    "/location-completions": {
+      "post": {
+        "tags": [
+          "execution"
+        ],
+        "summary": "Create Location Completion",
+        "operationId": "create_location_completion_location_completions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationCompletionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/executions/{execution_id}/evidence/photo": {
       "post": {
         "tags": [
@@ -2821,6 +2867,284 @@
         }
       }
     },
+    "/places": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "List Places",
+        "operationId": "list_places_places_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlaceOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Places Places Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Create Place",
+        "operationId": "create_place_places_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaceCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/places/{place_id}": {
+      "patch": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Update Place",
+        "operationId": "update_place_places__place_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "place_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Place Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaceUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Delete Place Endpoint",
+        "description": "Removes the place with its points and their history; the other places and the buildings\nstay (spec 2026-10-30-locais-externos-design.md §3).",
+        "operationId": "delete_place_endpoint_places__place_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "place_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Place Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/places/{place_id}/services": {
+      "post": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Add Place Service",
+        "operationId": "add_place_service_places__place_id__services_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "place_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Place Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaceServiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePointOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/places/{place_id}/deletion-impact": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Place Deletion Impact",
+        "operationId": "place_deletion_impact_places__place_id__deletion_impact_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "place_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Place Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionImpactOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/service-points": {
       "get": {
         "tags": [
@@ -2866,6 +3190,23 @@
                 }
               ],
               "title": "Building Id"
+            }
+          },
+          {
+            "name": "place_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Place Id"
             }
           }
         ],
@@ -4854,7 +5195,8 @@
           "POINT_IMPEDED",
           "BATCH_RELEASED",
           "POINTS_UNSERVED",
-          "APPEAL_FILED"
+          "APPEAL_FILED",
+          "COMPLETION_REFUSED"
         ],
         "title": "AlertKind"
       },
@@ -5349,7 +5691,14 @@
             "title": "Building Name"
           },
           "floor_label": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Label"
           },
           "released_at": {
@@ -6537,6 +6886,11 @@
           "rooms": {
             "type": "integer",
             "title": "Rooms"
+          },
+          "places": {
+            "type": "integer",
+            "title": "Places",
+            "default": 0
           }
         },
         "type": "object",
@@ -6715,8 +7069,15 @@
             "title": "Service Point Name"
           },
           "building_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Building Id"
           },
           "building_name": {
@@ -6724,7 +7085,14 @@
             "title": "Building Name"
           },
           "floor_label": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Label"
           },
           "checked_in_at": {
@@ -6972,8 +7340,15 @@
             "title": "Service Point Name"
           },
           "building_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Building Id"
           },
           "building_name": {
@@ -6981,7 +7356,14 @@
             "title": "Building Name"
           },
           "floor_label": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Label"
           },
           "checked_in_at": {
@@ -7602,6 +7984,138 @@
         ],
         "title": "IssueQrCodeRequest"
       },
+      "LocationCompletionRequest": {
+        "properties": {
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Idempotency Key"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "accuracy_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy M"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          },
+          "client_clock_offset_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Clock Offset Seconds"
+          },
+          "complaints_suggestions": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complaints Suggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route_stop_id",
+          "execution_id",
+          "idempotency_key",
+          "completed_at"
+        ],
+        "title": "LocationCompletionRequest"
+      },
+      "LocationCompletionResponse": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "route_stop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Route Stop Id"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          },
+          "validation_flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Validation Flags"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "route_stop_id",
+          "completed_at",
+          "validation_flags",
+          "review_status"
+        ],
+        "title": "LocationCompletionResponse"
+      },
       "LoginRequest": {
         "properties": {
           "email": {
@@ -7944,6 +8458,129 @@
           "notifications_summary"
         ],
         "title": "PersonalDataOut"
+      },
+      "PlaceCreateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "service_type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Type Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "latitude",
+          "longitude",
+          "service_type_id"
+        ],
+        "title": "PlaceCreateRequest"
+      },
+      "PlaceOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "latitude",
+          "longitude"
+        ],
+        "title": "PlaceOut"
+      },
+      "PlaceServiceRequest": {
+        "properties": {
+          "service_type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Type Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_type_id"
+        ],
+        "title": "PlaceServiceRequest"
+      },
+      "PlaceUpdateRequest": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "title": "PlaceUpdateRequest"
       },
       "PolygonFootprint": {
         "properties": {
@@ -8467,8 +9104,15 @@
             "title": "Service Point Id"
           },
           "floor_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Id"
           },
           "service_point_name": {
@@ -8476,7 +9120,14 @@
             "title": "Service Point Name"
           },
           "floor_label": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Label"
           },
           "building_name": {
@@ -8484,9 +9135,36 @@
             "title": "Building Name"
           },
           "building_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Building Id"
+          },
+          "place_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place Id"
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "QR",
+              "LOCATION"
+            ],
+            "title": "Completion"
           },
           "latitude": {
             "type": "number",
@@ -8588,6 +9266,8 @@
           "floor_label",
           "building_name",
           "building_id",
+          "place_id",
+          "completion",
           "latitude",
           "longitude",
           "distance_from_prev_m",
@@ -8649,9 +9329,28 @@
             "title": "Id"
           },
           "floor_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Floor Id"
+          },
+          "place_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place Id"
           },
           "name": {
             "type": "string",
@@ -8713,6 +9412,7 @@
         "required": [
           "id",
           "floor_id",
+          "place_id",
           "name",
           "description",
           "latitude",
