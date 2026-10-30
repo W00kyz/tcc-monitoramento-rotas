@@ -6892,14 +6892,20 @@
             "title": "Building Id"
           },
           "label": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Label"
           }
         },
         "type": "object",
         "required": [
-          "building_id",
-          "label"
+          "building_id"
         ],
         "title": "FloorCreateRequest"
       },
