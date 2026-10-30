@@ -9047,6 +9047,10 @@
             "type": "integer",
             "title": "Current Batch"
           },
+          "check_radius_meters": {
+            "type": "integer",
+            "title": "Check Radius Meters"
+          },
           "stops": {
             "items": {
               "$ref": "#/components/schemas/RouteStopOut"
@@ -9065,6 +9069,7 @@
           "started_at",
           "routing_degraded",
           "current_batch",
+          "check_radius_meters",
           "stops"
         ],
         "title": "RouteOut"
