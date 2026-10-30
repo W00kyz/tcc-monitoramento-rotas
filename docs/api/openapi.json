@@ -2407,6 +2407,418 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "floors"
+        ],
+        "summary": "Delete Floor Endpoint",
+        "description": "Removes the floor with its rooms, QR codes, points and their history (spec\n2026-10-29-andares-salas-design.md §3, same rule as the building).",
+        "operationId": "delete_floor_endpoint_floors__floor_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "floor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Floor Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/floors/{floor_id}/deletion-impact": {
+      "get": {
+        "tags": [
+          "floors"
+        ],
+        "summary": "Floor Deletion Impact",
+        "operationId": "floor_deletion_impact_floors__floor_id__deletion_impact_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "floor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Floor Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionImpactOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms": {
+      "get": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "List Rooms",
+        "operationId": "list_rooms_rooms_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "floor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Floor Id"
+            }
+          },
+          {
+            "name": "building_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Building Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomOut"
+                  },
+                  "title": "Response List Rooms Rooms Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Create Room",
+        "operationId": "create_room_rooms_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomCreateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room_id}": {
+      "patch": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Update Room",
+        "operationId": "update_room_rooms__room_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Delete Room Endpoint",
+        "description": "Removes the room with its points and their history; the floor and the other rooms stay\n(spec 2026-10-29-andares-salas-design.md §4 \"Remover sala\").",
+        "operationId": "delete_room_endpoint_rooms__room_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room_id}/services": {
+      "post": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Add Room Service",
+        "operationId": "add_room_service_rooms__room_id__services_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomServiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePointOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rooms/{room_id}/deletion-impact": {
+      "get": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Room Deletion Impact",
+        "operationId": "room_deletion_impact_rooms__room_id__deletion_impact_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Room Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionImpactOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/service-points": {
@@ -6121,6 +6533,10 @@
           "appeals": {
             "type": "integer",
             "title": "Appeals"
+          },
+          "rooms": {
+            "type": "integer",
+            "title": "Rooms"
           }
         },
         "type": "object",
@@ -6130,7 +6546,8 @@
           "routes",
           "executions",
           "photos",
-          "appeals"
+          "appeals",
+          "rooms"
         ],
         "title": "DeletionImpactOut",
         "description": "What a removal takes with it — shown before the manager confirms."
@@ -6924,13 +7341,18 @@
           "label": {
             "type": "string",
             "title": "Label"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
           }
         },
         "type": "object",
         "required": [
           "id",
           "building_id",
-          "label"
+          "label",
+          "level"
         ],
         "title": "FloorOut"
       },
@@ -7818,6 +8240,127 @@
         ],
         "title": "RevokeQrCodeRequest"
       },
+      "RoomCreateOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "floor_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Floor Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "cleaning": {
+            "type": "string",
+            "enum": [
+              "CREATED",
+              "SKIPPED",
+              "NO_CLEANING_TYPE",
+              "NO_OUTLINE"
+            ],
+            "title": "Cleaning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "floor_id",
+          "name",
+          "cleaning"
+        ],
+        "title": "RoomCreateOut"
+      },
+      "RoomCreateRequest": {
+        "properties": {
+          "floor_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Floor Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "with_cleaning": {
+            "type": "boolean",
+            "title": "With Cleaning",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "floor_id"
+        ],
+        "title": "RoomCreateRequest"
+      },
+      "RoomOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "floor_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Floor Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "floor_id",
+          "name"
+        ],
+        "title": "RoomOut"
+      },
+      "RoomServiceRequest": {
+        "properties": {
+          "service_type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Type Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_type_id"
+        ],
+        "title": "RoomServiceRequest"
+      },
+      "RoomUpdateRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "RoomUpdateRequest"
+      },
       "RouteOut": {
         "properties": {
           "id": {
@@ -8144,6 +8687,22 @@
               }
             ],
             "title": "Service Type Name"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
           }
         },
         "type": "object",
@@ -8155,7 +8714,9 @@
           "latitude",
           "longitude",
           "service_type_id",
-          "service_type_name"
+          "service_type_name",
+          "room_id",
+          "active"
         ],
         "title": "ServicePointOut"
       },
@@ -8180,6 +8741,17 @@
               }
             ],
             "title": "Service Type Id"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
           }
         },
         "additionalProperties": false,
