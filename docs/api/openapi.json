@@ -7311,7 +7311,9 @@
           "label": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
               },
               {
                 "type": "null"
@@ -7360,6 +7362,8 @@
         "properties": {
           "label": {
             "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
             "title": "Label"
           }
         },
@@ -8723,11 +8727,25 @@
       "ServicePointUpdateRequest": {
         "properties": {
           "name": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Name"
           },
           "description": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Description"
           },
           "service_type_id": {
@@ -8756,10 +8774,6 @@
         },
         "additionalProperties": false,
         "type": "object",
-        "required": [
-          "name",
-          "description"
-        ],
         "title": "ServicePointUpdateRequest"
       },
       "ServiceTypeOut": {
