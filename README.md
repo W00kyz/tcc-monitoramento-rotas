@@ -49,6 +49,12 @@ Usuários do seed (senha `trocar-esta-senha`):
 Novos usuários criados pelo administrador recebem um convite por e-mail (no Mailpit) com
 o link para definir a senha.
 
+Regra de horário: o primeiro início de rota do dia só é aceito de segunda a sexta, das
+07:00 às 17:00 (America/Fortaleza). Fora disso o servidor responde 409 e o app mostra o
+botão desabilitado; depois de iniciada, a rota segue utilizável (fotos, check-in,
+finalizar) mesmo após as 17:00. Os limites ficam em `system_settings`, editáveis pelo
+administrador.
+
 Sem o script, o equivalente manual é:
 
 ```bash
@@ -77,6 +83,58 @@ flutter run --dart-define=API_BASE_URL=http://<ip-da-máquina>:8000 \
 Para o link de recuperação de senha abrir no celular, `DASHBOARD_BASE_URL` no
 `infra/.env` precisa apontar para o IP da máquina, não para `localhost` — e o painel passa
 a ser aberto por esse mesmo endereço, que é a única origem liberada no CORS da API.
+
+### Banco de testes
+
+Um segundo banco, só para os **testes manuais** do autor com o app e o painel, em qualquer
+dia e horário. A regra de horário (07:00–17:00, seg–sex) vale no banco real; o banco de
+testes a desliga por configuração própria: o seed dele grava expediente `00:00:00`–`23:59:59`,
+todos os dias da semana e raio de presença de 25 m. Não existe "modo teste" no código: a
+exceção são **só dados** desse banco e não alcança o real. Não serve para pytest, vitest nem
+CI.
+
+```bash
+./infra/scripts/dev-up-test.sh            # sobe (cria o banco de testes na primeira vez)
+./infra/scripts/dev-up-test.sh --reset    # apaga o banco de testes e recria do zero
+```
+
+- Projeto compose separado (`route-monitor-test`), volumes próprios; recusa rodar com a stack
+  real de pé (mesmas portas): derrube o `dev-up.sh` antes. `Ctrl+C` derruba os containers e
+  mantém o volume.
+- Cinco prédios reais do OpenStreetMap (Casa 1 a 5, de 1 a 3 salas cada) em volta da Rua
+  Raimundo da Silva Ribeiro, Tambor, Campina Grande. O retângulo do campus é o das casas mais
+  500 m.
+- Mapa e roteamento próprios, gerados por `infra/scripts/build-test-map.sh` em `infra/data-test/`
+  (não versionado) na primeira subida. Precisa do extrato do Nordeste: rode antes
+  `./infra/scripts/fetch-osm.sh` (ver "Dados de mapa").
+- Logins: os mesmos do seed real (senha `trocar-esta-senha`). O seed imprime a chave pública
+  dos QR Codes e a linha de `flutter run` pronta.
+- "Uma vez por dia" continua valendo: depois de iniciar e finalizar, o botão fica desabilitado.
+  Para repetir, recrie o banco com `--reset`.
+
+App apontando para o banco de testes (o mapa embarcado `assets/tambor.pmtiles` e o centro
+são escolhidos na compilação):
+
+```bash
+cd mobile
+flutter run --dart-define=API_BASE_URL=http://<ip-da-máquina>:8000 \
+            --dart-define=QR_PUBLIC_KEY_HEX=<valor impresso pelo seed> \
+            --dart-define=CAMPUS_TILES_ASSET=assets/tambor.pmtiles \
+            --dart-define=CAMPUS_CENTER=-7.25561775,-35.888482125
+```
+
+No emulador Android, `API_BASE_URL=http://10.0.2.2:8000`, e o GPS se simula com
+`adb emu geo fix <lng> <lat>` (longitude primeiro), por exemplo
+`adb emu geo fix -35.888482 -7.255618`. A leitura de QR Code continua pedindo aparelho
+físico. O painel enquadra o mapa pelo `VITE_CAMPUS_BBOX`, que o compose de testes já define.
+
+Limitações conhecidas dos dados:
+
+- O OpenStreetMap é esparso perto do endereço: os cinco contornos são `building=yes` (não
+  confirmados como residenciais) e quatro deles ficam a ~450–490 m do centro.
+- O número 359 não existe no OSM. O centro é o centróide da way 1195393305 (ver
+  `center_note` em `backend/app/seed_data/tambor_buildings.json`).
+- `infra/data-test/` é criado pelo Docker como root; apagar exige `sudo`.
 
 ## Dados de mapa
 
