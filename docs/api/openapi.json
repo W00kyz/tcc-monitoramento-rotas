@@ -8150,6 +8150,27 @@
       },
       "MyDayOut": {
         "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "start_opens_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Opens At"
+          },
+          "workday_over": {
+            "type": "boolean",
+            "title": "Workday Over"
+          },
           "service_day": {
             "type": "boolean",
             "title": "Service Day"
@@ -8179,6 +8200,9 @@
         },
         "type": "object",
         "required": [
+          "server_time",
+          "start_opens_at",
+          "workday_over",
           "service_day",
           "route",
           "position_report_interval_seconds",
@@ -8186,7 +8210,7 @@
           "location_silence_release_minutes"
         ],
         "title": "MyDayOut",
-        "description": "The worker's day for the app: today's route, if any, and the location-silence limits it\nwarns the worker about (spec §7.3)."
+        "description": "The worker's day for the app: today's route, if any, and the location-silence limits it\nwarns the worker about (spec §7.3). `server_time` is the server clock, so the app counts down to\n`start_opens_at` without trusting the device clock; `workday_over` is true only on a service\nday after the workday ended.\n\nExample: ``{\"server_time\": \"2026-10-20T09:56:00Z\", \"start_opens_at\": \"2026-10-20T10:00:00Z\",\n\"workday_over\": false, ...}``"
       },
       "MyFieldWorkerOut": {
         "properties": {
@@ -9624,6 +9648,11 @@
             "type": "integer",
             "title": "Location Silence Release Minutes"
           },
+          "workday_start_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Workday Start Time"
+          },
           "workday_end_time": {
             "type": "string",
             "format": "time",
@@ -9667,6 +9696,7 @@
           "outside_campus_release_minutes",
           "location_silence_warning_minutes",
           "location_silence_release_minutes",
+          "workday_start_time",
           "workday_end_time",
           "service_weekdays",
           "appeal_window_hours",
@@ -9831,6 +9861,18 @@
               }
             ],
             "title": "Location Silence Release Minutes"
+          },
+          "workday_start_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workday Start Time"
           },
           "workday_end_time": {
             "anyOf": [
