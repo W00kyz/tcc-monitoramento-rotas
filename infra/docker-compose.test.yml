@@ -1,0 +1,25 @@
+# Sobreposição do banco de testes manual (Rua Raimundo da Silva Ribeiro, Tambor,
+# Campina Grande). Nunca é usada sozinha: entra por cima do docker-compose.yml,
+# sempre com o projeto separado `route-monitor-test`:
+#
+#   docker compose -p route-monitor-test \
+#     -f infra/docker-compose.yml -f infra/docker-compose.test.yml up ...
+#
+# O `-p` dá containers, rede e volumes nomeados próprios (route-monitor-test_*),
+# então os dados da stack real nunca são tocados. Quem sobe isso é o
+# infra/scripts/dev-up-test.sh. Aqui só muda o que é específico do Tambor: os
+# dados do OSRM e o recorte do mapa do painel. O resto vem do arquivo base.
+services:
+  osrm:
+    command: osrm-routed --algorithm mld /data/tambor.osrm
+    volumes:
+      # O compose mescla volumes pelo ponto de montagem (/data): este entra no lugar
+      # do ./data:/data:ro do arquivo base, não ao lado dele.
+      - ./data-test:/data:ro
+
+  dashboard:
+    environment:
+      # south,west,north,east — a bbox das 5 edificações de
+      # backend/app/seed_data/tambor_buildings.json (4 casas decimais). O painel
+      # abre o mapa nesse recorte em vez do campus da UFCG.
+      VITE_CAMPUS_BBOX: "-7.2609,-35.8899,-7.2541,-35.8850"

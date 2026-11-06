@@ -95,6 +95,9 @@ services:
       dockerfile: Dockerfile
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+      # Vazio na stack real: o painel enquadra o campus da UFCG. O banco de testes
+      # (docker-compose.test.yml) define o recorte do Tambor.
+      VITE_CAMPUS_BBOX: ${VITE_CAMPUS_BBOX:-}
     ports:
       - "${DASHBOARD_PORT}:5173"
     volumes:
