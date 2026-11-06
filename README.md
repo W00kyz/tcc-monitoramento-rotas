@@ -52,8 +52,9 @@ o link para definir a senha.
 Regra de horário: o primeiro início de rota do dia só é aceito de segunda a sexta, das
 07:00 às 17:00 (America/Fortaleza). Fora disso o servidor responde 409 e o app mostra o
 botão desabilitado; depois de iniciada, a rota segue utilizável (fotos, check-in,
-finalizar) mesmo após as 17:00. Os limites ficam em `system_settings`, editáveis pelo
-administrador.
+finalizar) mesmo após as 17:00, exceto retomar uma rota pausada ou pedir novo lote, que
+também ficam barrados depois das 17:00. Os limites ficam em `system_settings`, editáveis
+pelo administrador.
 
 Sem o script, o equivalente manual é:
 
@@ -111,6 +112,11 @@ CI.
   dos QR Codes e a linha de `flutter run` pronta.
 - "Uma vez por dia" continua valendo: depois de iniciar e finalizar, o botão fica desabilitado.
   Para repetir, recrie o banco com `--reset`.
+- As "24 h" do banco de testes são, na prática, `00:00:00`–`23:59:58`: às 23:59:59 a trava de
+  fim de expediente (`>=`) ainda vale.
+- A stack de testes mantém o agendador de alertas e as regras de liberação por silêncio
+  ligados: numa rodada manual um ponto pode ser liberado após 45 minutos sem GPS, e as rotas
+  abertas são encerradas no fim do dia (23:59:59).
 
 App apontando para o banco de testes (o mapa embarcado `assets/tambor.pmtiles` e o centro
 são escolhidos na compilação):
