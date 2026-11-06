@@ -16,11 +16,19 @@
 # este script não baixa nem embarca glifos (Ruling 14 / Etapa 4, confirmado
 # inerte e removido na Etapa 5, Task 20) — a referência em si permanece no
 # JSON, só não tem efeito.
+#
+# Parametrizável por variáveis de ambiente; sem nenhuma definida, o comportamento
+# é o do campus (MAP_PREFIX=campus, MAP_DATA_DIR=infra/data, CAMPUS_BBOX em
+# infra/osm/bbox.env). build-test-map.sh as define para o banco de testes.
+#   MAP_PREFIX     prefixo do PMTiles copiado. Padrão: campus
+#   MAP_DATA_DIR   diretório de dados. Padrão: infra/data
+# O estilo copiado é sempre o mesmo (campus-style.json), seja qual for o prefixo.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_DIR="$(dirname "$SCRIPT_DIR")"
-DATA_DIR="$INFRA_DIR/data"
+MAP_PREFIX="${MAP_PREFIX:-campus}"
+DATA_DIR="${MAP_DATA_DIR:-$INFRA_DIR/data}"
 MAP_DIR="$INFRA_DIR/map"
 REPO_DIR="$(dirname "$INFRA_DIR")"
 MOBILE_ASSETS="$REPO_DIR/mobile/assets"
@@ -34,14 +42,14 @@ fi
 
 mkdir -p "$DATA_DIR"
 
-if [[ ! -f "$DATA_DIR/campus.pmtiles" ]]; then
-  echo "ERRO: $DATA_DIR/campus.pmtiles não existe. Rodar build-pmtiles.sh primeiro." >&2
+if [[ ! -f "$DATA_DIR/$MAP_PREFIX.pmtiles" ]]; then
+  echo "ERRO: $DATA_DIR/$MAP_PREFIX.pmtiles não existe. Rodar build-pmtiles.sh primeiro." >&2
   exit 1
 fi
 
 echo "==> Copiando assets para $MOBILE_ASSETS"
 mkdir -p "$MOBILE_ASSETS"
-cp "$DATA_DIR/campus.pmtiles" "$MOBILE_ASSETS/campus.pmtiles"
+cp "$DATA_DIR/$MAP_PREFIX.pmtiles" "$MOBILE_ASSETS/$MAP_PREFIX.pmtiles"
 cp "$AUTHORED_STYLE" "$MOBILE_ASSETS/campus-style.json"
 
 echo "==> Pronto. Conteúdo de $MOBILE_ASSETS:"

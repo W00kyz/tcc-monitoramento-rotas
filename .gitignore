@@ -15,6 +15,7 @@ CLAUDE.local.md
 
 # Artefatos grandes de infraestrutura — gerados por script, nunca commitados
 infra/data/
+infra/data-test/
 *.pmtiles
 *.osm.pbf
 *.osrm*
